@@ -27,6 +27,7 @@ class a_star(Node):
 
     def __init__(self):
         super().__init__('a_Star')
+        print("a_star is ready")
         # 로직 1. publisher, subscriber 만들기
         self.map_sub = self.create_subscription(OccupancyGrid,'map',self.map_callback,1)
         self.odom_sub = self.create_subscription(Odometry,'odom',self.odom_callback,1) #로봇의 위치를 받아서 출발지로 하기 위하여 odom받음
@@ -61,24 +62,30 @@ class a_star(Node):
 
     def grid_update(self):
         self.is_grid_update=True
+        
         '''
-        로직 3. 맵 데이터 행렬로 바꾸기
+        로직 3. 맵 데이터 행렬로 바꾸기 - 완료
         메시지를 통해 받은 맵은 1차원 배열로 들어오기 때문에 좀 더 직관적으로 사용 위해 350*350인 2차원행렬로 바꿔준다.
-        map_to_grid=
-        self.grid=
         '''
+        map_to_grid=list(map(int, self.map_msg.data)) # 리스트로 만들고 int형으로 바꾼다.
+        
+        self.grid=np.reshape(map_to_grid, (350,350)) # 350*350 그리드로 만듬
+        print(self.grid)
 
 
     def pose_to_grid_cell(self,x,y):
         map_point_x = 0
         map_point_y = 0
         '''
-        로직 4. 위치(x,y)를 map의 grid cell로 변환 
+        로직 4. 위치(x,y)를 map의 grid cell로 변환 - 완료 하긴했는데 이상함..
         (테스트) pose가 (-8,-4)라면 맵의 중앙에 위치하게 된다. 따라서 map_point_x,y 는 map size의 절반인 (175,175)가 된다.
-        pose가 (-16.75,12.75) 라면 맵의 시작점에 위치하게 된다. 따라서 map_point_x,y는 (0,0)이 된다.
-        map_point_x= ?
-        map_point_y= ?
+        pose가 (-16.75,-12.75) 라면 맵의 시작점에 위치하게 된다. 따라서 map_point_x,y는 (0,0)이 된다.???시작위치 -12.75인듯.. rviz2에서 확실하게 확인했음.
         '''
+        # 사전학습 5강 11분 30초 
+        map_point_x= (x-self.map_offset_x)/ self.map_resolution
+        map_point_y= (y-self.map_offset_y)/ self.map_resolution
+        #print("x: ",map_point_x) -직
+        #print("y: ",map_point_y) -직
         
         return map_point_x,map_point_y
 
@@ -88,28 +95,33 @@ class a_star(Node):
         x = 0
         y = 0
         '''
-        로직 5. map의 grid cell을 위치(x,y)로 변환
+        로직 5. map의 grid cell을 위치(x,y)로 변환 - 완료햇긴한데 이상함..
         최단경로 탐색결과는 맵의 cell로 얻어지기 때문에 전역경로로 만들 때는 위치 x y로 변환해서 사용해야한다.
         변환에는 map_offset, map_size, map_resolution이용
         (테스트) grid cell이 (175,175)라면 맵의 중앙에 위치하게 된다. 따라서 pose로 변환하게 되면 맵의 중앙인 (-8,-4)가 된다.
-        grid cell이 (350,350)라면 맵의 제일 끝 좌측 상단에 위치하게 된다. 따라서 pose로 변환하게 되면 맵의 좌측 상단인 (0.75,6.25)가 된다.
-
-        x=?
-        y=?
-
+        grid cell이 (350,350)라면 맵의 제일 끝 좌측 상단에 위치하게 된다. 따라서 pose로 변환하게 되면 맵의 좌측 상단인 (0.75,6.25)가 된다. ??? (0.75, 4.75)인데..?
         '''
+
+        grid_x, grid_y = grid_cell
+        # grid_x, grid_y = (350,350) -직
+        
+        x = grid_x * self.map_resolution + self.map_offset_x
+        y = grid_y * self.map_resolution + self.map_offset_y
+        # print("x: ", x) -직
+        # print("y: ", y) -직
+        
         return [x,y]
 
 
     def odom_callback(self,msg):
         self.is_odom=True
         self.odom_msg=msg
+        
 
 
     def map_callback(self,msg):
         self.is_map=True
         self.map_msg=msg
-        
 
     def goal_callback(self,msg):
         
@@ -119,17 +131,24 @@ class a_star(Node):
             목적지를 받았을 때 호출되는 함수
             다른 frame에서 찍으면 좌표계가 다르기 때문에 rviz의 fixed_frame이 'map'인 상태에서 목적지를 입력했을 때만 사용 가능
             x y 좌표를 받아서 pose_to_grid_cell 함수로 목적지를 cell 단위로 바꿔준다.
-            goal_x=
-            goal_y=
-            goal_cell=
-            self.goal = 
-            '''             
-            print(msg)
+            
+            '''
+            goal_x = msg.pose.position.x
+            goal_y = msg.pose.position.y
+            goal_cell = self.pose_to_grid_cell(goal_x,goal_y)
+            self.goal = list(map(int, goal_cell))
+            
+            # print(goal_cell) - 직             
+            # print(self.goal) - 직
+            # print(msg)
             
 
             if self.is_map ==True and self.is_odom==True  :
                 if self.is_grid_update==False :
                     self.grid_update()
+                    # 아래 줄은 테스트 다 하면 지우기
+                    # self.grid_cell_to_pose((350,350)) -직
+                    
 
         
                 self.final_path=[]

@@ -21,6 +21,7 @@ class loadMap(Node):
 
     def __init__(self):
         super().__init__('load_map')
+        print("load map is ready")
         self.map_pub = self.create_publisher(OccupancyGrid, 'map', 1)
         
         time_period=1  
