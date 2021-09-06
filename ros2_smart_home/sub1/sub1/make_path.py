@@ -35,10 +35,11 @@ class makePath(Node):
 
 
         '''
-        로직 2. 저장할 경로 및 텍스트파일 이름을 정하고, 쓰기 모드로 열기
-        full_path=
-        self.f=
+        로직 2. 저장할 경로 및 텍스트파일 이름을 정하고, 쓰기 모드로 열기 - 완료
         '''
+        full_path = 'C:\\Users\\multicampus\\Desktop\\test_loop.txt'
+        self.f = open(full_path,'w')
+        
         
         self.is_odom=True
         #이전 위치를 저장할 변수입니다.
@@ -51,15 +52,16 @@ class makePath(Node):
 
 
     def listener_callback(self,msg):
-        print('x : {} , y : {} '.format(msg.pose.pose.position.x,msg.pose.pose.position.y))
+        # print('x : {} , y : {} '.format(msg.pose.pose.position.x,msg.pose.pose.position.y))
         if self.is_odom ==False :   
-            pass
+            # pass
             '''
-            로직 3. 콜백함수에서 처음 메시지가 들어오면 초기 위치를 저장해줍니다. 
-            self.is_odom = 
-            self.prev_x = 
-            self.prev_y = 
+            로직 3. 콜백함수에서 처음 메시지가 들어오면 초기 위치를 저장해줍니다. - 완료
             '''
+            self.is_odom = True
+            self.prev_x = msg.pose.pose.position.x
+            self.prev_y = msg.pose.pose.position.y
+            
 
         else :            
             waypint_pose=PoseStamped()
@@ -68,30 +70,31 @@ class makePath(Node):
             y=msg.pose.pose.position.y
    
             '''
-            로직 4. 콜백함수에서 이전 위치와 현재 위치의 거리 계산
+            로직 4. 콜백함수에서 이전 위치와 현재 위치의 거리 계산 - 완료
             (테스트) 유클리디안 거리를 구하는 부분으로 x=2, y=2 이고, self.prev_x=0, self.prev_y=0 이라면 distance=2.82가 나와야합니다.
+            '''
 
-            distance = 
-            '''
+            distance = sqrt(pow(x - self.prev_x,2) + pow(y - self.prev_y, 2))
+
             
             
-            '''
             if distance > 0.1 :
-                로직 5. 거리차이가 위치보다 0.1m 이상일 때 위치를 path_msg.poses에 추가하고 publish
-                waypint_pose.pose.position.x=
-                waypint_pose.pose.position.y=
+                #로직 5. 거리차이가 위치보다 0.1m 이상일 때 위치를 path_msg.poses에 추가하고 publish
+                waypint_pose.pose.position.x=x
+                waypint_pose.pose.position.y=y
                 waypint_pose.pose.orientation.w=1.0
                 self.path_msg.poses.append(waypint_pose)
                 self.path_pub.publish(self.path_msg)                
-            '''
+            
                 
-            '''
-                로직 6. x,y 를 문자열로 바꾸고 x와 y 사이의 문자열은 /t 로 구분
-                data=
-                self.f
+            
+                #로직 6. x,y 를 문자열로 바꾸고 x와 y 사이의 문자열은 /t 로 구분
+                
+                data = '{0}\t{1}\n'.format(x,y)
                 self.prev_x=x
                 self.prev_y=y
-            '''
+                self.f.write(data) 
+            
 
             
             

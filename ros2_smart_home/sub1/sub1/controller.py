@@ -62,7 +62,7 @@ class Controller(Node):
         self.app_status_msg=msg  
 
     def app_all_on(self):
-        print("on")
+        
         for i in range(17):
             self.app_control_msg.data[i]=1
         self.app_control_pub.publish(self.app_control_msg)
@@ -74,13 +74,20 @@ class Controller(Node):
         
     def app_on_select(self,num):
         '''
-        로직 2. 특정 가전 제품 ON
+        로직 2. 특정 가전 제품 ON - 완료
         '''
+
+        self.app_control_msg.data[num]=1
+        self.app_control_pub.publish(self.app_control_msg)
+        
 
     def app_off_select(self,num):
         '''
-        로직 3. 특정 가전 제품 OFF
+        로직 3. 특정 가전 제품 OFF - 완료
         '''
+        
+        self.app_control_msg.data[num]=2
+        self.app_control_pub.publish(self.app_control_msg)
 
     def turtlebot_go(self) :
         self.cmd_msg.linear.x=0.3
@@ -88,32 +95,50 @@ class Controller(Node):
 
     def turtlebot_stop(self) :
         '''
-        로직 4. 터틀봇 정지
+        로직 4. 터틀봇 정지 - 완료
         '''
+        self.cmd_msg.linear.x=0.0
 
     def turtlebot_cw_rot(self) :
         '''
-        로직 5. 터틀봇 시계방향 회전
+        로직 5. 터틀봇 시계방향 회전 - 완료
         '''
+        self.cmd_msg.angular.z=1.0
 
     def turtlebot_cww_rot(self) :
         '''
-        로직 6. 터틀봇 반시계방향 회전
+        로직 6. 터틀봇 반시계방향 회전 - 완료
         '''
+        self.cmd_msg.angular.z=-1.0
 
 
     def timer_callback(self):
 
         '''
         로직1. 수신 데이터 출력
-        터틀봇 상태 : 현재 선솏도, 현재 각속도, 배터리 상태, 충전 상태 출력
+        터틀봇 상태 : 현재 선솏도, 현재 각속도, 배터리 상태, 충전 상태 출력(1)
         환경 정보 : 날짜, 시간, 온도, 날씨 출력
         가전 제품 : 가전상태 출력        
         '''
+        # (1)
+        # print("\
+        #     current_linear vel : {0}, current_angular_vel : {1}, battery : {2}, supply_status : {3}"
+        #     .format(\
+        #         self.turtlebot_status_msg.twist.linear.x,\
+        #         self.turtlebot_status_msg.twist.angular.z,\
+        #         self.turtlebot_status_msg.battery_percentage,\
+        #         self.turtlebot_status_msg.power_supply_status))
+        
+        # (2)
+        print("date : {},{}, time : {}, temp : {}, weather : {}".format(self.envir_status_msg.month,self.envir_status_msg.day, self.envir_status_msg.hour, self.envir_status_msg.temperature, self.envir_status_msg.weather))
 
+        # (3)
+        # print("app status : {0}".format(self.app_control_msg.data))
+
+        
         ## IOT(가전) 제어 함수
         # self.app_all_on()
-        # self.app_all_off()
+        self.app_all_off()
         # self.app_select_on(12)
         # self.app_select_off(12)
 
@@ -122,7 +147,7 @@ class Controller(Node):
         self.turtlebot_go()
         # self.turtlebot_stop()
         # self.turtlebot_cw_rot()
-        # self.turtlebot_ccw_rot()
+        # self.turtlebot_cww_rot()
 
         self.cmd_publisher.publish(self.cmd_msg)
 

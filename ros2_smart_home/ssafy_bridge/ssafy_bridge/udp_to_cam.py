@@ -30,7 +30,6 @@ class IMGPublisher(Node):
 
     def __init__(self):
         super().__init__(node_name='IMGPublisher')
-
         self.publisher_ = self.create_publisher(CompressedImage, '/image_jpeg/compressed', 10)
         self.udp_parser = UDP_CAM_Parser(self.publisher_, ip=params_cam_0["localIP"], port=params_cam_0["localPort"], params_cam=params_cam_0)        
 

@@ -28,12 +28,13 @@ class IMGParser(Node):
         ## 미리 정의된 토픽 이름인 '/image_jpeg/compressed' 에서
         ## CompressedImage 메시지를 받도록 설정된다.
 
+        print("hello1")
         self.subscription = self.create_subscription(
             CompressedImage,
             '/image_jpeg/compressed',
             self.img_callback,
             10)
-        
+        print(self.subscription)
 
     def img_callback(self, msg):
 
@@ -44,25 +45,35 @@ class IMGParser(Node):
         np_arr = np.frombuffer(msg.data, np.uint8)
         img_bgr = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         '''
-        로직 3. 이미지 색 채널을 gray scale로 컨버팅
+        로직 3. 이미지 색 채널을 gray scale로 컨버팅 - 완료
         cv2. 내의 이미지 색 채널 컨터버로 bgr 색상을 gary scale로 바꾸십시오.
+        '''
+        img_gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
 
-        img_gray = 
+        
 
         '''
-
-        '''
-        로직 4. 이미지 resizing
+        로직 4. 이미지 resizing - 완료
         cv2를 사용해서 이미지를 원하는 크기로 바꿔보십시오.
-
-        img_resize = 
         '''
+        # interpolation= cv2.INTER_AREA : 사이즈 줄일 때 사용하는 보간법
+        # cv2.resize(img, dsize, fx, fy, interpolation)
+        # Parameters:	
+
+        # dsize – Manual Size. 가로, 세로 형태의 tuple(ex; (100,200))
+        # fx – 가로 사이즈의 배수. 2배로 크게하려면 2. 반으로 줄이려면 0.5
+        # fy – 세로 사이즈의 배수
+        # interpolation – 보간법
+        
+        # h, w, _ = img_gray.shape : 세로, 가로, 채널 수 사이즈를 얻는 것
+
+        img_resize =  cv2.resize(img_gray, None, fx=0.5,fy=0.5, interpolation= cv2.INTER_AREA)
+        
 
         # 로직 5. 이미지 출력 (cv2.imshow)       
-        
-        cv2.imshow("img_bgr", img_bgr)
+        # cv2.imshow("img_bgr", img_bgr)
         # cv2.imshow("img_gray", img_gray)
-        # cv2.imshow("resize and gray", img_resize)       
+        cv2.imshow("resize and gray", img_resize)       
         
         cv2.waitKey(1)
 
