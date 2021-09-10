@@ -42,7 +42,7 @@ class astarLocalpath(Node):
         self.timer = self.create_timer(time_period, self.timer_callback)
         self.local_path_size=30 
         self.count=0
-
+        self.current_waypoint = -1
 
     def listener_callback(self,msg):
         self.is_odom=True
@@ -50,16 +50,16 @@ class astarLocalpath(Node):
 
 
     def path_callback(self,msg):
-        pass
+        # pass
         '''
         로직 2. global_path 데이터 수신 후 저장
         path_callback은 전역경로가 수신될 때마다 호출되는 함수
         is_path변수에 True를 놓고 전역경로가 들어왔는지 확인할 수 있게하고, 받은 데이터를 global_path_msg에 저장한다.
-
-        self.is_path=True
-        self.global_path_msg=
-        
         '''
+        self.is_path=True
+        self.global_path_msg=msg
+        
+        
 
         
     def timer_callback(self):
@@ -73,32 +73,44 @@ class astarLocalpath(Node):
             current_waypoint=-1
             
             '''
-            로직 4. global_path 중 로봇과 가장 가까운 포인트 계산
+            로직 4. global_path 중 로봇과 가장 가까운 포인트 계산 - 완료
             path_pub의 5 6번 로직과 같은 부분
-            
-            min_dis=
-            for i,waypoint in enumerate(self.global_path_msg.poses) : 
-                distance=
-                if distance < min_dis :
-                    min_dis=
-                    current_waypoint=
+            '''
+            min_dis=float('inf')
+            for i,waypoint in enumerate(self.global_path_msg.poses) :
 
-            '''           
+                distance= sqrt(pow(x-waypoint.pose.position.x,2)+pow(y-waypoint.pose.position.y,2))
+                if distance < min_dis and abs(self.current_waypoint-i)<5:
+                    min_dis= distance
+                    current_waypoint= i
+                    self.current_waypoint = i           
             
             
             '''
-            로직 5. local_path 예외 처리
-
-            if current_waypoint != -1 : 
-                if current_waypoint + self.local_path_size < len(self.global_path_msg.poses):
-                    
-                    
+            로직 5. local_path 예외 처리 - 완료
+            '''
+            # 끝자락에서 인덱스 번호 없는 것을 가지고 올려고 할때 에러생기는 것 방지
+            if current_waypoint != -1 :
+                if current_waypoint + self.local_path_size < len(self.global_path_msg.poses):                 
+                    for num in range(current_waypoint,current_waypoint + self.local_path_size) :
+                        tmp_pose = PoseStamped()
+                        tmp_pose.pose.position.x=self.global_path_msg.poses[num].pose.position.x
+                        tmp_pose.pose.position.y=self.global_path_msg.poses[num].pose.position.y
+                        tmp_pose.pose.orientation.w =1.0
+                        local_path_msg.poses.append(tmp_pose)                    
                 
+
                 else :
+                    for num in range(current_waypoint,len(self.global_path_msg.poses) ) :
+                        tmp_pose = PoseStamped()
+                        tmp_pose.pose.position.x = self.global_path_msg.poses[num].pose.position.x
+                        tmp_pose.pose.position.y = self.global_path_msg.poses[num].pose.position.y
+                        tmp_pose.pose.orientation.w = 1.0
+                        local_path_msg.poses.append(tmp_pose)       
 
                     
                               
-            '''           
+                      
 
             self.local_path_pub.publish(local_path_msg)
         
