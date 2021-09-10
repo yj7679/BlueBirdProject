@@ -7,7 +7,7 @@ from squaternion import Quaternion
 from nav_msgs.msg import Odometry,OccupancyGrid,MapMetaData,Path
 from math import pi,cos,sin
 from collections import deque
-
+import heapq as hq
 # a_star 노드는  OccupancyGrid map을 받아 grid map 기반 최단경로 탐색 알고리즘을 통해 로봇이 목적지까지 가는 경로를 생성하는 노드입니다.
 # 로봇의 위치(/pose), 맵(/map), 목표 위치(/goal_pose)를 받아서 전역경로(/global_path)를 만들어 줍니다. 
 # goal_pose는 rviz2에서 2D Goal Pose 버튼을 누르고 위치를 찍으면 메시지가 publish 됩니다. 
@@ -79,13 +79,12 @@ class a_star(Node):
         '''
         로직 4. 위치(x,y)를 map의 grid cell로 변환 - 완료 하긴했는데 이상함..
         (테스트) pose가 (-8,-4)라면 맵의 중앙에 위치하게 된다. 따라서 map_point_x,y 는 map size의 절반인 (175,175)가 된다.
-        pose가 (-16.75,-12.75) 라면 맵의 시작점에 위치하게 된다. 따라서 map_point_x,y는 (0,0)이 된다.???시작위치 -12.75인듯.. rviz2에서 확실하게 확인했음.
+        pose가 (-16.75, -12.75) 라면 맵의 시작점에 위치하게 된다. 따라서 map_point_x,y는 (0,0)이 된다.???시작위치 -12.75인듯.. rviz2에서 확실하게 확인했음.
         '''
         # 사전학습 5강 11분 30초 
-        map_point_x= (x-self.map_offset_x)/ self.map_resolution
-        map_point_y= (y-self.map_offset_y)/ self.map_resolution
-        #print("x: ",map_point_x) -직
-        #print("y: ",map_point_y) -직
+        map_point_x= int((x-self.map_offset_x)/ self.map_resolution)
+        map_point_y= int((y-self.map_offset_y)/ self.map_resolution)
+
         
         return map_point_x,map_point_y
 
@@ -103,12 +102,10 @@ class a_star(Node):
         '''
 
         grid_x, grid_y = grid_cell
-        # grid_x, grid_y = (350,350) -직
-        
+
+        # 사전학습 5강 11분 30초 
         x = grid_x * self.map_resolution + self.map_offset_x
         y = grid_y * self.map_resolution + self.map_offset_y
-        # print("x: ", x) -직
-        # print("y: ", y) -직
         
         return [x,y]
 
@@ -142,13 +139,17 @@ class a_star(Node):
             # print(self.goal) - 직
             # print(msg)
             
+            '''
+            goal_x = msg.pose.position.x
+            goal_y = msg.pose.position.y
+            goal_cell = self.pose_to_grid_cell(goal_x,goal_y)
+            self.goal = list(map(int, goal_cell))
+
 
             if self.is_map ==True and self.is_odom==True  :
                 if self.is_grid_update==False :
                     self.grid_update()
-                    # 아래 줄은 테스트 다 하면 지우기
-                    # self.grid_cell_to_pose((350,350)) -직
-                    
+  
 
         
                 self.final_path=[]
@@ -163,8 +164,8 @@ class a_star(Node):
                 
                 # 다익스트라 알고리즘을 완성하고 주석을 해제 시켜주세요. 
                 # 시작지, 목적지가 탐색가능한 영역이고, 시작지와 목적지가 같지 않으면 경로탐색을 합니다.
-                # if self.grid[start_grid_cell[0]][start_grid_cell[1]] ==0  and self.grid[self.goal[0]][self.goal[1]] ==0  and start_grid_cell != self.goal :
-                #     self.dijkstra(start_grid_cell)
+                if self.grid[start_grid_cell[1]][start_grid_cell[0]] == 0  and self.grid[self.goal[1]][self.goal[0]] == 0  and start_grid_cell != self.goal :
+                    self.dijkstra(start_grid_cell)
 
 
                 self.global_path_msg=Path()
@@ -181,42 +182,67 @@ class a_star(Node):
                     self.a_star_pub.publish(self.global_path_msg)
 
     def dijkstra(self,start):
-        Q = deque()
-        Q.append(start)
-        self.cost[start[0]][start[1]] = 1
+
+        Q = [(self.hEucl(start), start)]
+        self.cost[start[1]][start[0]] = 1
+        hq.heapify(Q)
+
         found = False
+        print("다익스트라 실행")
+
         '''
         로직 7. grid 기반 최단경로 탐색
         deque를 이용해 탐색할 노드를 하나씩 append해서 사용하며 Q에 더 이상 탐색할 노드가 없으면 
         while문을 빠져나온다.
         그게 아니면 Q의 popleft()를 이용해 탐색할 노드를 선택하고 dx, dy를 이용해 next가 for문을 돌 때마다 바뀌게 설정한다.
+        '''
+        
+        while len(Q) !=0 : 
+            if Q[0][1] == self.goal: 
+                break
 
-        while ??:
-            if ??:
-                ??
-
-            current =??
+            current = hq.heappop(Q)[1]
 
             for i in range(8):
                 #next는 current에 인접한 노드가 선택된다.
-                next = ??
+                next = (current[0] + self.dx[i], current[1] + self.dy[i]) 
                 if next[0] >= 0 and next[1] >= 0 and next[0] < self.GRIDSIZE and next[1] < self.GRIDSIZE:
                     # next노드의 grid값이 50보다 작으면 로봇이 갈 수 있다는 의미이기 때문에 코스트 계산
                     # 코스트가 낮으면 path, cost변수를 갱신 후 Q에 next를 넣어준다.
-                        if self.grid[next[0]][next[1]] < 50:
-                            if ??:
-                                Q.??
-                                self.path[next[0]][next[1]] = ???
-                                self.cost[next[0]][next[1]] = ???
+                        if self.grid[next[1]][next[0]] < 50:
+                            if self.cost[current[1]][current[0]] + self.dCost[i] < self.cost[next[1]][next[0]]:
+                                
+                                self.path[next[1]][next[0]] = current
+                                self.cost[next[1]][next[0]] = self.cost[current[1]][current[0]] + self.dCost[i]
+                                priority = self.cost[next[1]][next[0]] + self.hEucl(next)
+
+                                hq.heappush(Q, (priority, next))
         # 모든 노드의 탐색이 끝났으면 저장했던 path를 역으로 추적해서 최종 경로를 얻는다.
         # 주석대로 처리하면 dijkstra방식이고 여기에 heuristic함수를 추가하면 a_star가 된다.
-        node = ??
-        while ?? 
-            nextNode = ??
-            self.final_path.??
-            node = ??
-        '''       
-        
+        node = self.goal
+
+
+
+        while node != start:
+            y = node[1]
+            x = node[0]
+            nextNode = self.path[y][x]
+            self.final_path.append(nextNode)
+            node = nextNode
+    
+    
+    def hEucl(self, node):
+        dx = abs(node[0] - self.goal[0])
+        dy = abs(node[1] - self.goal[1])
+        D = 1 
+        return D * np.sqrt(dx * dx + dy * dy)           
+    
+    def hMan(self, node):
+        dx = abs(node[0] - self.goal[0])
+        dy = abs(node[1] - self.goal[1])
+        D = 1
+        return D * (dx + dy) 
+
 
         
 def main(args=None):

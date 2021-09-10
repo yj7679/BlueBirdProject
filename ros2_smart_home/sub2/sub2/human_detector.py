@@ -17,7 +17,7 @@ from ssafy_msgs.msg import BBox
 # 로직 7 : bbox 결과 show
 # 로직 8 : bbox msg 송신
 
-
+# 같은 사람에게 생기는 여러 크고 작은 박스를 하나의 큰 박스로 묶는다.
 def non_maximum_supression(bboxes, threshold=0.5):
 
     """
@@ -39,9 +39,9 @@ def non_maximum_supression(bboxes, threshold=0.5):
     bboxes.pop(0)
 
     for _, bbox in enumerate(bboxes):
-
         for new_bbox in new_bboxes:
 
+            # x, y, w, h
             x1_tl = bbox[0]
             x2_tl = new_bbox[0]
             x1_br = bbox[0] + bbox[2]
@@ -53,12 +53,26 @@ def non_maximum_supression(bboxes, threshold=0.5):
             
             """
             # 로직 4 : 두 bbox의 겹치는 영역을 구해서, 영역이 안 겹칠때 new_bbox로 save
-            x_overlap = 
-            y_overlap = 
+            """
+            x_overlap = 0
+            y_overlap = 0
+
+            if x1_tl<= x2_tl <=x1_br :
+                x_overlap = min(x1_br, x2_br)-x2_tl
+            elif x2_tl <= x1_tl <= x2_br:
+                x_overlap = min(x2_br, x1_br)-x1_tl
+
+            if y1_tl<= y2_tl <=y1_br :
+                y_overlap = min(y1_br, y2_br)-y2_tl
+            elif y2_tl <= y1_tl <= y2_br:
+                y_overlap = min(y2_br, y1_br)-y1_tl
+
+
+            
             overlap_area = x_overlap * y_overlap
             
-            area_1 = 
-            area_2 = 
+            area_1 = bbox[2]*bbox[3]
+            area_2 = new_bbox[2]*new_bbox[3]
             
             total_area = area_1 + area_2 - overlap_area
             overlap_area = overlap_area / float(total_area)
@@ -66,9 +80,7 @@ def non_maximum_supression(bboxes, threshold=0.5):
             if overlap_area < threshold:
 
                 new_bboxes.append(bbox)
-
-            """
-
+            
     return new_bboxes
 
 
@@ -126,28 +138,31 @@ class HumanDetector(Node):
 
             ## 각 bbox의 center, width, height의 꼭지점들을 리스트에 넣어 놓고
             ## 메세지 내 x,y,w,h에 채워넣는 방식으로 하시면 됩니다.
-           
+           """
             for (x,y,w,h) in rects:
     
-                xl.append(x)
-                yl.append(y)
-                wl.append(w)
-                hl.append(h)
+                xl.append(int(x))
+                yl.append(int(y))
+                wl.append(int(x+w))
+                hl.append(int(y+h))
 
             if self.able_to_pub:
 
-                self.bbox_msg.num_bbox = 
+                self.bbox_msg.num_bbox = len(rects)
 
-                obj_list = 
+                obj_list = rects
+                idxl=[]
+                for i in range(len(obj_list)) :
+                    idxl.append(i)
+                self.bbox_msg.idx_bbox = idxl
 
-                self.bbox_msg.idx_bbox = 
+                self.bbox_msg.x = xl
+                self.bbox_msg.y = yl
+                self.bbox_msg.w = wl
+                self.bbox_msg.h = hl
+ 
 
-                self.bbox_msg.x = 
-                self.bbox_msg.y = 
-                self.bbox_msg.w = 
-                self.bbox_msg.h = 
-
-            """
+            
 
             for (x,y,w,h) in rects:
 
@@ -189,4 +204,3 @@ def main(args=None):
 if __name__ == '__main__':
 
     main()
-
