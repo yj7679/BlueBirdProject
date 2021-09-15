@@ -41,7 +41,7 @@ class loadMap(Node):
         self.map_offset_y=-4-8.75
         self.map_data = [0 for i in range(self.map_size_x*self.map_size_y)] #이게 2중 for문인가?
         grid=np.array(self.map_data)
-        grid=np.reshape(grid,(350, 350),order='F')
+        grid=np.reshape(grid,(350, 350))
 
         self.map_msg.header.frame_id="map"
 
