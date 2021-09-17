@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp">
+
+    <TextView
+        android:id="@+id/text_view_id"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="LOGIN"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textSize="30sp"
+        android:layout_marginBottom="16dp"
+        />
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="100sp"
+        android:background="@null"
+        android:src="@drawable/for_logintest"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        ></ImageView>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Email"
+            android:id="@+id/TextInputEditText_email">
+
+        </com.google.android.material.textfield.TextInputEditText>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Password"
+            android:id="@+id/TextInputEditText_password">
+
+        </com.google.android.material.textfield.TextInputEditText>
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/RelativeLayout_login"
+        android:clickable="true">
+
+    </RelativeLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/bin_blue"
+        android:textColor="#ffffff"
+        android:text="Login"
+        android:layout_marginBottom="16dp"
+
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"
+        android:text="Or"
+
+        >
+
+
+    </TextView>
+    <!--ERROR : drawable에 있는 설정대로 버튼 색이 안 바뀜 왜지!!!!-->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/bin_darkblue"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="16dp"
+        android:text="Log in with Kakaotalk"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="10"
+        > <!--? 여기 /이걸 넣느냐 안 넣느냐에 따라 뭐가 달라지네...-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="5"
+            android:textSize="24sp"
+            android:text="Find Password"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_weight="5"
+            android:text="Sign Up"
+            android:textSize="24sp"
+            android:textColor="@android:color/holo_blue_dark"
+            />
+    </LinearLayout>
+
+
+
+</LinearLayout>
