@@ -23,6 +23,7 @@ import heapq as hq
 # 6. goal_pose 메시지 수신하여 목표 위치 설정
 # 7. grid 기반 최단경로 탐색
 
+# 이 코드의 목표 : A* 알고리즘을 적용해서 글로벌 패스를 만든다.
 class a_star(Node):
 
     def __init__(self):
@@ -72,7 +73,7 @@ class a_star(Node):
         self.grid=np.reshape(map_to_grid, (350,350)) # 350*350 그리드로 만듬
         print(self.grid)
 
-
+    # 연속 좌표 x,y를 넣었을 때, 우리가 탐색할 수 있도록 그리드 위치로 만들어 주는 함수
     def pose_to_grid_cell(self,x,y):
         map_point_x = 0
         map_point_y = 0
@@ -88,7 +89,7 @@ class a_star(Node):
         
         return map_point_x,map_point_y
 
-
+    # 그리드 위치를 연속좌표 x,y로 만들어 주는 것
     def grid_cell_to_pose(self,grid_cell):
 
         x = 0
@@ -120,6 +121,7 @@ class a_star(Node):
         self.is_map=True
         self.map_msg=msg
 
+    # goal_pose 메시지는 rviz2에서 2D Goal pose 클릭하고 맵에 목적지 누르면 publish되기 때문에 a_star.py에서 받아올 수있음
     def goal_callback(self,msg):
         
         if msg.header.frame_id=='map':
@@ -139,17 +141,18 @@ class a_star(Node):
             # print(self.goal) - 직
             # print(msg)
             
-            '''
+            
             goal_x = msg.pose.position.x
             goal_y = msg.pose.position.y
             goal_cell = self.pose_to_grid_cell(goal_x,goal_y)
             self.goal = list(map(int, goal_cell))
 
 
+
             if self.is_map ==True and self.is_odom==True  :
                 if self.is_grid_update==False :
                     self.grid_update()
-  
+
 
         
                 self.final_path=[]
@@ -158,13 +161,13 @@ class a_star(Node):
                 y=self.odom_msg.pose.pose.position.y
                 start_grid_cell=self.pose_to_grid_cell(x,y)
 
-                self.path = [[0 for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)]
-                self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)])
+                self.path = [[0 for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)] # 방문 배열 -> 해당 그리드 위치에 갔을 때, 어디에서왔는지 좌표를 저장
+                self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)]) # 코스트 비교할 때, 필요할 때
 
                 
                 # 다익스트라 알고리즘을 완성하고 주석을 해제 시켜주세요. 
                 # 시작지, 목적지가 탐색가능한 영역이고, 시작지와 목적지가 같지 않으면 경로탐색을 합니다.
-                if self.grid[start_grid_cell[1]][start_grid_cell[0]] == 0  and self.grid[self.goal[1]][self.goal[0]] == 0  and start_grid_cell != self.goal :
+                if self.grid[start_grid_cell[0]][start_grid_cell[1]] == 0  and self.grid[self.goal[0]][self.goal[1]] == 0  and start_grid_cell != self.goal :
                     self.dijkstra(start_grid_cell)
 
 
@@ -188,7 +191,7 @@ class a_star(Node):
         hq.heapify(Q)
 
         found = False
-        print("다익스트라 실행")
+        #print("다익스트라 실행")
 
         '''
         로직 7. grid 기반 최단경로 탐색
@@ -217,6 +220,7 @@ class a_star(Node):
                                 priority = self.cost[next[1]][next[0]] + self.hEucl(next)
 
                                 hq.heappush(Q, (priority, next))
+
         # 모든 노드의 탐색이 끝났으면 저장했던 path를 역으로 추적해서 최종 경로를 얻는다.
         # 주석대로 처리하면 dijkstra방식이고 여기에 heuristic함수를 추가하면 a_star가 된다.
         node = self.goal
@@ -226,6 +230,7 @@ class a_star(Node):
         while node != start:
             y = node[1]
             x = node[0]
+            print(x, y)
             nextNode = self.path[y][x]
             self.final_path.append(nextNode)
             node = nextNode
