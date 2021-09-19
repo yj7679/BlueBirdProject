@@ -108,7 +108,7 @@ class IMGParser(Node):
     
             x, y, w, h = cv2.boundingRect(cnt)
 
-            cv2.rectangle(self.img_bgr,(x,y),(x+w,y+h),(0,0,255),3)
+            cv2.rectangle(self.img_bgr,(x,y),(x+w,y+h),(0,0,255),2)
 
             
 
