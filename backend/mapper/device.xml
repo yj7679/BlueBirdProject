@@ -3,7 +3,7 @@
 
 <mapper namespace="device">
     <!-- 방 번호 입력하면 그 방에 있는 기기 리스트 조회 -->
-    <select id="searchDeviceByRoomNumber" parameterType="int" resultType="list">
+    <select id="searchDevicesByRoomNumber" parameterType="int" resultType="list">
         SELECT *
         FROM device
         WHERE room_number = #{room_number};
@@ -11,14 +11,14 @@
     <!-- 특정 기기 켜기 -->
     <update id="onDeviceByPK" parameterType="int" resultType="boolean">
         UPDATE device
-        SET is_on = 'true'
+        SET is_on = 1
         WHERE device_number = #{device_number}
     </update>
     
     <!-- 특정 기기 끄기 -->
     <update id="offDeviceByPK" parameterType="int" resultType="boolean">
         UPDATE device
-        SET is_on = 'false'
+        SET is_on = 0
         WHERE device_number = #{device_number}
     </update>
         

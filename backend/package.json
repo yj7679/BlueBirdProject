@@ -1,20 +1,21 @@
 {
   "name": "bluebird",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "MIT",
-<<<<<<< HEAD
-=======
   "devDependencies": {
     "nodemon": "^2.0.12"
   },
->>>>>>> b8d28f0dd1b5edb08f9f56f7de0b6d848262c20d
   "dependencies": {
-    "express": "^4.17.1"
-  }
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "http": "0.0.1-security",
+    "mybatis-mapper": "^0.6.5",
+    "mysql": "^2.18.1"
+  },
+  "description": ""
 }
