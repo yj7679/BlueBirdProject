@@ -41,8 +41,6 @@ params_map = {
 
 
 def createLineIterator(P1, P2, img):
-
-    print("f")
     # Bresenham's line algorithm을 구현해서 이미지에 직선을 그리는 메소드입니다.
     
     # 로직 순서
@@ -77,15 +75,13 @@ def createLineIterator(P1, P2, img):
     dY = P2Y - P1Y
     dXa = np.abs(dX)
     dYa = np.abs(dY)
-    print("값")
-    print(dXa)
+
 
     """
     # 로직 2 : 직선을 그릴 grid map의 픽셀 좌표를 넣을 numpy array 를 predifine
     """
     itbuffer = np.empty(shape=(max(dYa,dXa),3))
     itbuffer.fill(np.nan)
-    print(itbuffer.shape)
     """
     # 로직 3 : 직선 방향 체크
     """
@@ -191,7 +187,7 @@ class Mapping:
         self.T_r_l = np.array([[0,-1,0],[1,0,0],[0,0,1]])
 
     def update(self, pose, laser):
-        print("update start")
+
         # 로직 7. pose 값을 받아서 좌표변환 행렬로 정의
         n_points = laser.shape[1]
         pose_mat = utils.xyh2mat2D(pose)
@@ -213,8 +209,7 @@ class Mapping:
         laser_global_x = (laser_global[0] - self.map_center[0] + (self.map_size[0]*self.map_resolution)/2) / self.map_resolution
         laser_global_y = (laser_global[1] - self.map_center[1] + (self.map_size[1]*self.map_resolution)/2) / self.map_resolution
         
-        print(pose_x.shape)
-        print(laser_global.shape[1])
+
         """
         # 로직 10. laser scan 공간을 맵에 표시
         # p1은 현재위치 p2는 닿은 위치
@@ -223,17 +218,15 @@ class Mapping:
         for i in range(laser_global.shape[1]):
             p1 = np.array([pose_x, pose_y]).reshape(-1).astype(int)
             p2 = np.array([laser_global_x[i], laser_global_y[i]]).astype(int)
-            print("st")
+
             # line_iter = utils.createLineIterator(p1, p2, self.map) 원래이건데 오타인듯
             line_iter = createLineIterator(p1, p2, self.map)
-            print("en")
             # 라이다가 찍히는 위치와 그 사이에 칸이 없는 경우
             if (line_iter.shape[0] is 0):
                 continue
             
             avail_x = line_iter[:,0].astype(int)
             avail_y = line_iter[:,1].astype(int)
-            print(self.map.shape)
             ## Empty
             self.map[avail_y[:-1], avail_x[:-1]] = np.full(len(avail_x[:-1]),255)
         
@@ -266,7 +259,7 @@ class Mapping:
         laser_global_y =  (laser_global[1, :] - self.map_center[1] + (self.map_size[1]*self.map_resolution)/2) / self.map_resolution
 
         for i in range(laser_global.shape[1]):
-            (l_x, l_y) = np.array([laser_global_x[i], laser_global_y[i]]).astype(np.int)
+            (l_x, l_y) = np.array([laser_global_x[i], laser_global_y[i]]).astype(int)
             center = (l_x, l_y)
             cv2.circle(map_bgr, center, 1, (0,255,0), -1)
 
@@ -289,7 +282,7 @@ class Mapper(Node):
         # 로직 1 : publisher, subscriber, msg 생성
         self.subscription = self.create_subscription(LaserScan,
         '/scan',self.scan_callback,10)
-        self.map_pub = self.create_publisher(OccupancyGrid, '/map', 1)
+        self.map_pub = self.create_publisher(OccupancyGrid, '/local_map', 1)
         
         self.map_msg=OccupancyGrid()
         self.map_msg.header.frame_id="map"
@@ -359,36 +352,15 @@ class Mapper(Node):
         self.map_pub.publish(self.map_msg)
 
         
-
-def save_map(node,file_path):
-
-    # 로직 12 : 맵 저장
-    pkg_path ='C:\\Users\\multicampus\\Desktop\\IoTPJT\\ros2_smart_home\\sub3\\sub3'
-    back_folder='..'
-    folder_name='map'
-    file_name=file_path
-    full_path=os.path.join(pkg_path,back_folder,folder_name,file_name)
-    print(full_path)
-    f=open(full_path,'w')
-    data=''
-    for pixel in node.map_msg.data :
-
-        data+='{0} '.format(pixel)
-    f.write(data) 
-    f.close()
-
-        
 def main(args=None):    
     rclpy.init(args=args)
-    
-    try :    
-        run_mapping = Mapper()
-        rclpy.spin(run_mapping)
-        run_mapping.destroy_node()
-        rclpy.shutdown()
+  
+    run_mapping = Mapper()
+    rclpy.spin(run_mapping)
+    run_mapping.destroy_node()
+    rclpy.shutdown()
 
-    except :
-        save_map(run_mapping,'map3.txt')
+
         
 
 

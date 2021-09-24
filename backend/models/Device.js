@@ -20,7 +20,6 @@ module.exports = {
     },
     onDevice : function(data){
         const query = mybatisMapper.getStatement('device', 'onDeviceByPK', data);
-
         return new Promise((resolve, reject)=>{
             db.query(query, (err, result, fields)=>{
                 if(err){

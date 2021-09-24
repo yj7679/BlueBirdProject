@@ -15,7 +15,8 @@
     "express": "^4.17.1",
     "http": "0.0.1-security",
     "mybatis-mapper": "^0.6.5",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "request": "^2.88.2"
   },
   "description": ""
 }

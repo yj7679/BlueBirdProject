@@ -22,7 +22,7 @@ class loadMap(Node):
     def __init__(self):
         super().__init__('load_map')
         print("load map is ready")
-        self.map_pub = self.create_publisher(OccupancyGrid, 'map', 1)
+        self.map_pub = self.create_publisher(OccupancyGrid, 'global_map', 1)
         
         time_period=1  
         self.timer = self.create_timer(time_period, self.timer_callback)
@@ -38,10 +38,10 @@ class loadMap(Node):
         self.map_size_y=350
         self.map_resolution=0.05
         self.map_offset_x=-14.75
-        self.map_offset_y=1.05
+        self.map_offset_y=1.25
         self.map_data = [0 for i in range(self.map_size_x*self.map_size_y)] #이게 2중 for문인가?
         grid=np.array(self.map_data)
-        grid=np.reshape(grid,(350, 350))
+        grid=np.reshape(grid,(350, 350), order='F')
 
         self.map_msg.header.frame_id="map"
 

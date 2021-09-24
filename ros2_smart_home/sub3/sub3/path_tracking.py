@@ -31,6 +31,8 @@ class followTheCarrot(Node):
         self.subscription = self.create_subscription(Odometry,'/odom',self.odom_callback,10)
         self.status_sub = self.create_subscription(TurtlebotStatus,'/turtlebot_status',self.status_callback,10)
         self.path_sub = self.create_subscription(Path,'/local_path',self.path_callback,10)
+        self.subscription = self.create_subscription(Path,'/global_path',self.path_callback,10)
+        
         
         # 라이다 데이터 받기위한 subscriber
         self.lidar_sub = self.create_subscription(LaserScan, '/scan', self.lidar_callback, 10)
@@ -139,7 +141,7 @@ class followTheCarrot(Node):
                     
                     # 충돌이 났다면 장애물을 인식한 것을 토대로 경로를 다시 만든다.
                     if self.collision==True:
-                        self.cmd_msg.linear.x=0.0                            
+                        goal_callback()                            
            
             else :
                 print("no found forward point")
@@ -149,7 +151,125 @@ class followTheCarrot(Node):
             
             self.cmd_pub.publish(self.cmd_msg)
 
+    def goal_callback(self,msg):
+        
+        if msg.header.frame_id=='map':
+            '''
+            로직 6. goal_pose 메시지 수신하여 목표 위치 설정
+            목적지를 받았을 때 호출되는 함수
+            다른 frame에서 찍으면 좌표계가 다르기 때문에 rviz의 fixed_frame이 'map'인 상태에서 목적지를 입력했을 때만 사용 가능
+            x y 좌표를 받아서 pose_to_grid_cell 함수로 목적지를 cell 단위로 바꿔준다.
             
+            '''
+            goal_x = msg.pose.position.x
+            goal_y = msg.pose.position.y
+            goal_cell = self.pose_to_grid_cell(goal_x,goal_y)
+            self.goal = list(map(int, goal_cell))
+            
+            # print(goal_cell) - 직             
+            # print(self.goal) - 직
+            # print(msg)
+            
+            
+            goal_x = msg.pose.position.x
+            goal_y = msg.pose.position.y
+            goal_cell = self.pose_to_grid_cell(goal_x,goal_y)
+            self.goal = list(map(int, goal_cell))
+
+
+
+            if self.is_map ==True and self.is_odom==True  :
+                if self.is_grid_update==False :
+                    self.grid_update()
+
+
+        
+                self.final_path=[]
+
+                x=self.odom_msg.pose.pose.position.x
+                y=self.odom_msg.pose.pose.position.y
+                start_grid_cell=self.pose_to_grid_cell(x,y)
+
+                self.path = [[0 for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)] # 방문 배열 -> 해당 그리드 위치에 갔을 때, 어디에서왔는지 좌표를 저장
+                self.cost = np.array([[self.GRIDSIZE*self.GRIDSIZE for col in range(self.GRIDSIZE)] for row in range(self.GRIDSIZE)]) # 코스트 비교할 때, 필요할 때
+
+                
+                # 다익스트라 알고리즘을 완성하고 주석을 해제 시켜주세요. 
+                # 시작지, 목적지가 탐색가능한 영역이고, 시작지와 목적지가 같지 않으면 경로탐색을 합니다.
+                if self.grid[start_grid_cell[0]][start_grid_cell[1]] == 0  and self.grid[self.goal[0]][self.goal[1]] == 0  and start_grid_cell != self.goal :
+                    self.dijkstra(start_grid_cell)
+
+
+                self.global_path_msg=Path()
+                self.global_path_msg.header.frame_id='map'
+                for grid_cell in reversed(self.final_path) :
+                    tmp_pose=PoseStamped()
+                    waypoint_x,waypoint_y=self.grid_cell_to_pose(grid_cell)
+                    tmp_pose.pose.position.x=waypoint_x
+                    tmp_pose.pose.position.y=waypoint_y
+                    tmp_pose.pose.orientation.w=1.0
+                    self.global_path_msg.poses.append(tmp_pose)
+            
+                if len(self.final_path)!=0 :
+                    self.a_star_pub.publish(self.global_path_msg)
+
+    def dijkstra(self,start):
+
+        Q = [(self.hEucl(start), start)]
+        self.cost[start[1]][start[0]] = 1
+        hq.heapify(Q)
+
+        found = False
+        #print("다익스트라 실행")
+
+        '''
+        로직 7. grid 기반 최단경로 탐색
+        deque를 이용해 탐색할 노드를 하나씩 append해서 사용하며 Q에 더 이상 탐색할 노드가 없으면 
+        while문을 빠져나온다.
+        그게 아니면 Q의 popleft()를 이용해 탐색할 노드를 선택하고 dx, dy를 이용해 next가 for문을 돌 때마다 바뀌게 설정한다.
+        '''
+        
+        while len(Q) !=0 : 
+            if Q[0][1] == self.goal: 
+                break
+
+            current = hq.heappop(Q)[1]
+
+            for i in range(8):
+                #next는 current에 인접한 노드가 선택된다.
+                next = (current[0] + self.dx[i], current[1] + self.dy[i]) 
+                if next[0] >= 0 and next[1] >= 0 and next[0] < self.GRIDSIZE and next[1] < self.GRIDSIZE:
+                    # next노드의 grid값이 50보다 작으면 로봇이 갈 수 있다는 의미이기 때문에 코스트 계산
+                    # 코스트가 낮으면 path, cost변수를 갱신 후 Q에 next를 넣어준다.
+                        if self.grid[next[1]][next[0]] < 50:
+                            if self.cost[current[1]][current[0]] + self.dCost[i] < self.cost[next[1]][next[0]]:
+                                
+                                self.path[next[1]][next[0]] = current
+                                self.cost[next[1]][next[0]] = self.cost[current[1]][current[0]] + self.dCost[i]
+                                priority = self.cost[next[1]][next[0]] + self.hEucl(next)
+
+                                hq.heappush(Q, (priority, next))
+
+        # 모든 노드의 탐색이 끝났으면 저장했던 path를 역으로 추적해서 최종 경로를 얻는다.
+        # 주석대로 처리하면 dijkstra방식이고 여기에 heuristic함수를 추가하면 a_star가 된다.
+        node = self.goal
+
+
+
+        while node != start:
+            y = node[1]
+            x = node[0]
+            print(x, y)
+            nextNode = self.path[y][x]
+            self.final_path.append(nextNode)
+            node = nextNode
+    
+    
+    def hEucl(self, node):
+        dx = abs(node[0] - self.goal[0])
+        dy = abs(node[1] - self.goal[1])
+        D = 1 
+        return D * np.sqrt(dx * dx + dy * dy)            
 
     def odom_callback(self, msg):
         self.is_odom=True

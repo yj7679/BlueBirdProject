@@ -9,4 +9,5 @@ router.get('/:roomNumber', DeviceController.doGetDevices);
 router.post('/deviceon', DeviceController.OnDevice);
 router.post('/deviceoff', DeviceController.OffDevice);
 
+
 module.exports = router;
