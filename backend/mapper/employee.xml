@@ -11,6 +11,13 @@
         (#{room_number}, #{id}, #{name}, #{password}, #{company}, #{department},#{job}, #{x},#{y})
 	</insert>
 
+    <!-- 로그인 -->
+    <select id="loginEmployee" parameterType="map" resultType="int">
+        SELECT employee_number
+        FROM employee
+        WHERE id = #{id} and password = #{password}
+    </select>
+
     <!-- 유저 번호를 넣으면 유저의 정보를 모두 리턴 -->
     <select id="searchEmployeeByPK" parameterType="int" resultType="map">
         SELECT e.id, e.name, e.company, e.department, e.job, e.x, e.y

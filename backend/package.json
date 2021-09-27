@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
   },
   "author": "",
   "license": "MIT",
@@ -11,12 +12,18 @@
     "nodemon": "^2.0.12"
   },
   "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
     "dotenv": "^10.0.0",
+    "ejs": "^3.1.6",
     "express": "^4.17.1",
     "http": "0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
     "mybatis-mapper": "^0.6.5",
     "mysql": "^2.18.1",
-    "request": "^2.88.2"
+    "process": "^0.11.10",
+    "socket.io": "^2.4.1"
   },
   "description": ""
 }
