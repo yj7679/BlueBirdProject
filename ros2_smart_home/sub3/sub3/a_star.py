@@ -123,7 +123,6 @@ class a_star(Node):
 
     # goal_pose 메시지는 rviz2에서 2D Goal pose 클릭하고 맵에 목적지 누르면 publish되기 때문에 a_star.py에서 받아올 수있음
     def goal_callback(self,msg):
-        print("goal_callback")
         if msg.header.frame_id=='map':
             '''
             로직 6. goal_pose 메시지 수신하여 목표 위치 설정
@@ -136,13 +135,7 @@ class a_star(Node):
             goal_y = msg.pose.position.y
             goal_cell = self.pose_to_grid_cell(goal_x,goal_y)
             self.goal = list(map(int, goal_cell))
-            
-            print("here1")
-            print(goal_cell)          
-            print(self.goal) 
-            print(msg)
-            
-            print("here1")
+
             goal_x = msg.pose.position.x
             goal_y = msg.pose.position.y
             goal_cell = self.pose_to_grid_cell(goal_x,goal_y)
@@ -154,9 +147,6 @@ class a_star(Node):
             if self.is_map ==True and self.is_odom==True  :
                 if self.is_grid_update==False :
                     self.grid_update()
-
-                print("here2")
-
         
                 self.final_path=[]
 

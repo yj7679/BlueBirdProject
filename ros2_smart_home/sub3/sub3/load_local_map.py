@@ -33,7 +33,7 @@ params_map = {
     "MAP_RESOLUTION": 0.05,
     "OCCUPANCY_UP": 0.02,
     "OCCUPANCY_DOWN": 0.01,
-    "MAP_CENTER": (-6.0, 10.0),
+    "MAP_CENTER": (-6, 10),
     "MAP_SIZE": (17.5, 17.5),
     "MAP_FILENAME": 'test.png',
     "MAPVIS_RESIZE_SCALE": 2.0
@@ -232,6 +232,13 @@ class Mapping:
         
             ## Occupied
             self.map[avail_y[-1], avail_x[-1]] = 0
+            for dx in range(-5,6):
+                for dy in range(-5,6):
+                    nx = avail_x[-1] + dx
+                    ny = avail_y[-1] + dy
+                    if nx<0 or nx>=350 or ny<0 or ny>=350:
+                        continue
+                    self.map[ny, nx]=0
                 
 
         self.show_pose_and_points(pose, laser_global)        
@@ -268,8 +275,8 @@ class Mapping:
         cv2.circle(map_bgr, center, 2, (0,0,255), -1)
 
         map_bgr = cv2.resize(map_bgr, dsize=(0, 0), fx=self.map_vis_resize_scale, fy=self.map_vis_resize_scale)
-        cv2.imshow('Sample Map', map_bgr)
-        cv2.waitKey(1)
+        # cv2.imshow('Sample Map', map_bgr)
+        # cv2.waitKey(1)
 
 
 

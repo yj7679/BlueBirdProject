@@ -80,7 +80,7 @@ class astarLocalpath(Node):
             for i,waypoint in enumerate(self.global_path_msg.poses) :
 
                 distance= sqrt(pow(x-waypoint.pose.position.x,2)+pow(y-waypoint.pose.position.y,2))
-                if distance < min_dis and abs(self.current_waypoint-i)<5:
+                if distance < min_dis:
                     min_dis= distance
                     current_waypoint= i
                     self.current_waypoint = i           
