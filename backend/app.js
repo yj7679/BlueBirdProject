@@ -10,6 +10,12 @@ const io = require('socket.io')(server);
 
 const employeeRouter = require('./routes/employee');
 const deviceRouter = require('./routes/device');
+const cors = require('cors');
+
+app.use(cors({
+    origin: true,
+    credentials: true
+}))
 
 app.set('port', 3000);
 
@@ -30,14 +36,20 @@ io.on('connection', (socket)=>{
 
     io.emit('usercount', io.engine.clientsCount);
 
-    socket.on('msg',(msg)=>{
-        console.log('msg : ', msg);
-        io.emit('msg', msg);
+    socket.on('env_msg',(msg)=>{
+        console.log('env_msg : ', msg);
+        io.emit('env_msg', msg);
+        // socket.broadcast.emit('env_msg', msg);
+    })
+
+    socket.on('test', (data) => {
+        console.log(data);
     })
 
     socket.on('disconnect',()=>{
         console.log('disconnected');
     })
+
 })
 
 server.listen(app.get('port'), ()=>{

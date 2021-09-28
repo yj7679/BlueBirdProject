@@ -5,9 +5,21 @@
 </template>
 
 <script>
-// @ is an alias to /src
+import io from "socket.io-client";
 
 export default {
-  name: "Home"
+  name: "Home",
+  data() {
+    return {
+      receivedMessage: null
+    }
+  },
+  created() {
+    const socketClient = io.connect("http://localhost:3000");
+    console.log(socketClient);
+    socketClient.on("connect", () => { 
+      console.log("connection server");
+       });
+  }
 };
 </script>
