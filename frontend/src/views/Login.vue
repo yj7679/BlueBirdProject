@@ -1,8 +1,8 @@
 <template>
-    <div class="aa container-fluid pt-5 pb-5">
-        <div class="container">
+    <div class="container">
+        <div class="container pt-5">
             <img src="../assets/img/peace.png" 
-            class="mx-auto d-block m-5" alt="Cinque Terre">
+            class="main_img mx-auto d-block m-5" alt="Cinque Terre">
         </div>
         <div class="container">
             <div class="row m-5 p-2"></div>
@@ -46,7 +46,7 @@ export default {
 </script>
 
 <style>
-img {
-    width:50%;
+.main_img {
+    width:100px;
 }
 </style>
