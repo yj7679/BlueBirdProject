@@ -1,36 +1,32 @@
 <template>
-    <div class="back">     
-        <b-container fluid class="back">
-            <div>
-                <b-form-group
-                id="fieldset-horizontal"
-                label-cols-sm="4"
-                label-cols-lg="3"
-                content-cols-sm
-                content-cols-lg="7"
-                label="아이디"
-                label-for="input-horizontal"
-                >
-                <b-form-input id="input-horizontal"></b-form-input>
-
-                </b-form-group>
-                <b-form-group
-                id="fieldset-horizontal"
-                label-cols-sm="4"
-                label-cols-lg="3"
-                content-cols-sm
-                content-cols-lg="7"
-                label="비밀번호"
-                label-for="input-horizontal"
-                >
-                <b-form-input id="input-horizontal"></b-form-input>
-                </b-form-group>
-
-                <div>
-                <b-button block variant="primary">Block Level Button</b-button>
+    <div class="bg-image" style="background-image: url('@/assets/img/background.png'); height:100%;">
+        <div class="container">
+            <img width="100px" src="../assets/img/peace.png" 
+            class="mx-auto d-block m-5" alt="Cinque Terre">
+        </div>
+        <div class="container">
+            <div class="row m-5 p-2"></div>
+        </div>
+        <div class="container">
+            <form action="/action_page.php">
+                <div class="form-group pt-2">
+                    <label for="number">사원번호:</label>
+                    <input type="number" class="form-control" placeholder="사원번호를 입력하세요" id="email">
                 </div>
-            </div>
-        </b-container>
+                <div class="form-group pt-2">
+                    <label for="pwd">비밀번호:</label>
+                    <input type="password" class="form-control" placeholder="비밀번호를 입력하세요" id="pwd">
+                </div>
+                <div class="form-group form-check pt-2">
+                    <label class="form-check-label">
+                    <input class="form-check-input" type="checkbox"> 사원번호 저장하기
+                    </label>
+                </div>
+                <div class="d-grid">
+                    <button @click="login" type="button" class="btn btn-primary btn-block mt-3">로그인</button>
+                </div>
+                </form>
+        </div>
     </div>
 </template>
 
@@ -39,14 +35,17 @@ export default {
     name: 'login',
     data() {
         return {
-            src : "../assets/img/background.png",
+            
+        }
+    },
+    methods: {
+        login(){
+
         }
     },
 }
 </script>
 
 <style>
-.back{
-    background-image: url("../assets/img/background.png");
-}
+
 </style>
