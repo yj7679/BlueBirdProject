@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-image" style="background-image: url('@/assets/img/background.png'); height:100%;">
+    <div class="container pt-5">
         <div class="container">
             <img width="100px" src="../assets/img/peace.png" 
             class="mx-auto d-block m-5" alt="Cinque Terre">
