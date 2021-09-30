@@ -8,7 +8,7 @@ const express = require('express');
 
 // const employee_service = require('./models/Employee');
 // const device_service = require('./models/Device');
-//const room_service = require('./models/Room');
+const room_service = require('./models/Room');
 // client 경로의 폴더를 지정해줍니다.
 // const publicPath = path.join(__dirname, "/../client");
 var app = express();
@@ -50,17 +50,20 @@ io.on('connection', socket => {
         console.log('목적지로 이동')
         console.log('x,y', data)
         // 음성 명령어에서 분리
-        const where = data.where;
+        const where = {
+            "name" : data.where,
+        }
         // const what = data.what;
         // const destination = data.destination;
 
 
         console.log('search start room by name : ', where);
-        // room_service.getRoom(where).then((result) => {
+        room_service.getRoom(where).then((result) => {
             
-        //     console.log('search start room x, y by name : ', result);
-        //     socket.to(roomName).emit('goToGoal', result);
-        // })
+            console.log('search start room x, y by name : ', result);
+            socket.to(roomName).emit('goToGoal', result);
+        })
+        // room_service.getRoom(where);
 
  
     })

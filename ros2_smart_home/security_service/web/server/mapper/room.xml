@@ -4,9 +4,9 @@
 <mapper namespace="room">
 
     <!-- 방 이름을 넣으면 방 정보 조회 -->
-    <select id="searchRoomByRoomName" parameterType="string" resultType="map">
+    <select id="searchRoomByRoomName" parameterType="map" resultType="map">
         SELECT r.room_number, r.name,r.x, r.y
         From room r
-        WHERE r.name = ${name}
+        WHERE r.name = #{name}
     </select>
 </mapper>

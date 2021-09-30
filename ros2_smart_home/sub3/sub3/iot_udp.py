@@ -7,6 +7,7 @@ import socket
 import threading
 import struct
 import binascii
+import datetime
 
 # iot_udp 노드는 udp 통신을 이용해 iot로 부터 uid를 얻어 접속, 제어를 하는 노드입니다.
 # sub1,2 에서는 ros 메시지를 이용해 쉽게 제어했지만, advanced iot 제어에서는 정의된 통신프로토콜을 보고 iot와 직접 데이터를 주고 받는 형식으로 제어하게 됩니다.
@@ -59,21 +60,25 @@ class iot_udp(Node):
         self.data_size=65535 
         self.parsed_data=[]
         
+        self.lock = threading.Lock()
+        self.countmsg = 0
+
         # 로직 2. 멀티스레드를 이용한 데이터 수신
         thread = threading.Thread(target=self.recv_udp_data)
         thread.daemon = True 
         thread.start() 
+
 
         self.is_recv_data=False
 
         # os.system('cls')
         while True:
             # 로직 5. 사용자 메뉴 생성
-            # print('Select Menu [0: scan, 1: connect, 2:control, 3:disconnect, 4:all_procedures ] ')
+            print('Select Menu [0: scan, 1: connect, 2:control, 3:disconnect, 4:all_procedures ] ')
             menu=int(input())
 
             if menu == 0 :
-                pass
+                self.scan()
             elif menu == 1:
                 pass
             elif menu == 2:
@@ -90,25 +95,32 @@ class iot_udp(Node):
         로직 3. 수신 데이터 파싱
         '''
 
-        header=raw_data[:30].decode('utf-8')
-        print(header)
-        # data_length=encode_data[19:23]
-        # aux_data=encode_data[23:45]
+        header=raw_data[:19].decode('utf-8')
+        data_length=raw_data[19:23]
+        aux_data=raw_data[23:35]
 
-        # print('header : ', header)
-        # print('data length : ', data_length)
-        # print('aux data : ', aux_data)
+        # print("헤더: ", header)
+        # print("데이터 길이: ", data_length[0])
+        # print("aux_data: ", aux_data)
 
-
-        # if header == ?? and data_length[0] == ??:
-        #     uid_pack=??
-        #     uid=self.packet_to_uid(uid_pack)
+        if header == '#Appliances-Status$' and data_length[0] == 20:
+            uid_pack=raw_data[35:51]
+            uid=self.packet_to_uid(uid_pack)
         
-        #     network_status=??
-        #     device_status=??
+            network_status=raw_data[51:53]
+            device_status=raw_data[53:55]
             
-        #     self.is_recv_data=True
-        #     self.recv_data=[uid,network_status,device_status]
+            print('uid : ', uid)
+            print('network : ', params_status[(network_status[0], network_status[1])])
+            print('device status : ',params_status[(device_status[0], device_status[1])])
+            self.is_recv_data=True
+            self.recv_data=[uid,network_status,device_status]
+            
+            # print('1 sleep')
+            time.sleep(1)
+            print(self.countmsg, datetime.datetime.now())
+            self.is_recv_data=False
+            self.recv_data=['','','']
         
  
     def send_data(self,uid,cmd):
@@ -134,13 +146,11 @@ class iot_udp(Node):
 
     def recv_udp_data(self):
         while True :
-            raw_data, sender = self.sock.recvfrom(self.data_size)
+            # raw_data, sender = self.sock.recvfrom(self.data_size)
+            raw_data, sender = self.sock.recvfrom(64)
+            self.countmsg += 1
             self.data_parsing(raw_data)
-            
 
-
-            
-        
             
     def uid_to_packet(self,uid):
         uid_pack=binascii.unhexlify(uid)
@@ -169,6 +179,13 @@ class iot_udp(Node):
         주변에 들어오는 iot 데이터(uid,network status, device status)를 출력하세요.
 
         '''
+        print(self.is_recv_data)
+        # if self.is_recv_data is True:
+        #     print('uid : ', self.recv_data[0])
+        #     print('network : ', params_status[(self.recv_data[1][0], self.recv_data[1][1])])
+        #     print('device status : ', params_status[(self.recv_data[2][0], self.recv_data[2][1])])
+        # else :
+        #     print('no iot data')
         
                    
 
@@ -181,6 +198,7 @@ class iot_udp(Node):
         나머지 상태일 때는 TRY_TO_CONNECT 명령을 보내서 iot에 접속하세요.
 
         '''
+        
 
     
     def control(self):
