@@ -7,12 +7,12 @@ const path = require('path');
 const express = require('express');
 
 // client 경로의 폴더를 지정해줍니다.
-const publicPath = path.join(__dirname, "/../client");
+// const publicPath = path.join(__dirname, "/../client");
 var app = express();
 
-const picPath = path.join(__dirname, "/../client");
+// const picPath = path.join(__dirname, "/../client");
 
-app.use(express.static(publicPath));
+// app.use(express.static(publicPath));
 
 // 로직 1. WebSocket 서버, WebClient 통신 규약 정의
 const server = require('http').createServer(app);
@@ -34,8 +34,9 @@ io.on('connection', socket => {
     socket.join(roomName);
 
     // 로직 3. 사용자의 메시지 수신시 WebClient로 메시지 전달
-    socket.on('safety_status', (message) => {
-        socket.to(roomName).emit('sendSafetyStatus', message);
+    socket.on('env_msg', (message) => {
+        console.log(message);
+        socket.to(roomName).emit('envMsg', message);
     });
 
     socket.on('PatrolStatus', (message) => {

@@ -43,7 +43,7 @@ class goFront(Node):
         def disconnect():
             print('disconnected from server')
 
-        self.sio.connect('http://localhost:3000/')
+        self.sio.connect('http://localhost:12001/')
 
         time_period = 0.3
         self.timer = self.create_timer(time_period, self.timer_callback)
@@ -58,10 +58,6 @@ class goFront(Node):
         if self.env_msg != '':
             env_msg = dict()
             env_msg['weather'] = self.env_msg.weather
-            env_msg['day'] = self.env_msg.day
-            env_msg['hour'] = self.env_msg.hour
-            env_msg['minute'] = self.env_msg.minute
-            env_msg['month'] = self.env_msg.month
             env_msg['temperature'] = self.env_msg.temperature
             self.sio.emit('env_msg', env_msg)
 
