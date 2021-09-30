@@ -32,9 +32,6 @@ def aircon_on(data):
 def aircon_off(data):
     print('message received with ', data)
 
-@sio.on('msg')
-def get_msg(data):
-    print(data)
 
 @sio.event
 def disconnect():

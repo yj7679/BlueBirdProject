@@ -19,6 +19,7 @@ module.exports = {
             });
         });
     },
+
     insertEmployee : function(data){
         const query = mybatisMapper.getStatement('employee', 'insertEmployee', data);
         return new Promise((resolve, reject)=>{
@@ -32,19 +33,5 @@ module.exports = {
                 }
             });
         });
-    },
-    loginEmployee : function(data){
-        const query = mybatisMapper.getStatement('employee', 'loginEmployee', data);
-        return new Promise((resolve, reject)=>{
-            db.query(query, (err, result, fields)=>{
-                if(err){
-                    console.log(err);
-                    reject(err);
-                }
-                else{
-                    resolve(result);
-                }
-            })
-        })
     }
 }

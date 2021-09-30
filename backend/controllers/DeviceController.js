@@ -56,8 +56,6 @@ module.exports = {
         const data = {
             'device_number' : req.body.device_number
         }
-        // ROS device off 메세지 전송
-        req.io.emit('msg', 'device off!');
         
         console.log('turn off #device : ', req.body.device_number);
         Device.offDevice(data).then((result)=>{

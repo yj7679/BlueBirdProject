@@ -8,13 +8,12 @@ import time
 from sensor_msgs.msg import CompressedImage, LaserScan
 from ssafy_msgs.msg import BBox
 
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 
 from sub2.ex_calib import *
 
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
-
 
 # 설치한 tensorflow를 tf 로 import 하고,
 # object_detection api 내의 utils인 vis_util과 label_map_util도 import해서
@@ -50,12 +49,12 @@ params_lidar = {
     "localIP": "127.0.0.1",
     "localPort": 9094,
     "Block_SIZE": int(1206),
-    "X": 0.00, # meter
-    "Y": 0.0,
-    "Z": 0.19 + 0.1,
-    "YAW": 0.0, # deg
-    "PITCH": 0.0,
-    "ROLL": 0.0
+    "X": 0, # meter
+    "Y": 0,
+    "Z": 0.6,
+    "YAW": 0, # deg
+    "PITCH": 0,
+    "ROLL": 0
 }
 
 
@@ -66,12 +65,12 @@ params_cam = {
     "localIP": "127.0.0.1",
     "localPort": 1232,
     "Block_SIZE": int(65000),
-    "X": 0.03, # meter
-    "Y": 0.00,
-    "Z":  0.19,
-    "YAW": 0.0, # deg
-    "PITCH": 0.0,
-    "ROLL": 0.0
+    "X": 0, # meter
+    "Y": 0,
+    "Z": 1,
+    "YAW": 0, # deg
+    "PITCH": 5,
+    "ROLL": 0
 }
 
 
@@ -182,7 +181,7 @@ def main(args=None):
     # back_folder='catkin_ws\\src\\ros2_smart_home\\sub3'
     # back_folder='Desktop\\test_ws\\src\\ssafy_smarthome\\sub3'
 
-    CWD_PATH = 'C:\\Users\\multicampus\\Desktop\\IoTPJT\\ros2_smart_home\\sub3\\sub3'
+    CWD_PATH = os.getcwd()
     
     MODEL_NAME = 'ssd_mobilenet_v1_coco_2018_01_28'
 
@@ -285,7 +284,6 @@ def main(args=None):
         xy_i = l2c_trans.project_pts2img(xyz_c, False)
 
         xyii = np.concatenate([xy_i, xyz_p], axis=1)
-        # print(xyii)
 
         """
 
@@ -295,18 +293,17 @@ def main(args=None):
         ## 본래 이미지 비율에 맞춰서 integer로 만들어
         ## numpy array로 변환
 
-        """
         if len(boxes_detect) != 0:
 
             ih = img_bgr.shape[0]
             iw = img_bgr.shape[1]
 
-            boxes_np = np.array(boxes_detect)
+            boxes_np = 
 
-            x = boxes_np.T[0] * iw
-            y = boxes_np.T[1] * ih
-            w = (boxes_np.T[2] - boxes_np.T[0]) * iw
-            h = (boxes_np.T[3] - boxes_np.T[1]) * ih
+            x = 
+            y = 
+            w = 
+            h = 
 
             bbox = np.vstack([
                 x.astype(np.int32).tolist(),
@@ -315,9 +312,10 @@ def main(args=None):
                 h.astype(np.int32).tolist()
             ]).T
 
-            # print(bbox)
+        """
 
-
+            
+        """
 
             # 로직 13. 인식된 물체의 위치 추정
             ## bbox가 구해졌으면, bbox 안에 들어가는 라이다 포인트 들을 구하고
@@ -331,17 +329,13 @@ def main(args=None):
                 w = int(bbox[i, 2])
                 h = int(bbox[i, 3])
 
-                cx = (x + w) // 2
-                cy = (y + h) // 2
+                cx = 
+                cy = 
                 
-                xyv = xyii[np.logical_and(xyii[:, 0]>=cx-0.4*w, xyii[:, 0]<cx+0.4*w), :]
-                xyv = xyv[np.logical_and(xyv[:, 1]>=cy-0.4*h, xyv[:, 1]<cy+0.4*h), :]
-                
-            #     xyv = 
+                xyv = 
 
                 ## bbox 안에 들어가는 라이다 포인트들의 대표값(예:평균)을 뽑는다
-                ostate = np.median(xyv, axis=0)
-                # print(ostate)
+                ostate = 
 
                 ## 대표값이 존재하면 
                 if not np.isnan(ostate[0]):
@@ -349,8 +343,9 @@ def main(args=None):
 
             image_process = draw_pts_img(image_process, xy_i[:, 0].astype(np.int32),
                                             xy_i[:, 1].astype(np.int32))
-            
+
             print(ostate_list)
+        """
         visualize_images(image_process, infer_time)
 
     g_node.destroy_node()

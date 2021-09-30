@@ -1,10 +1,7 @@
-const { disconnect } = require('process');
-
 const express = require('express');
-const cookieParser = require('cookie-parser');
-const morgan = require('morgan');
 
 const app = express();
+<<<<<<< HEAD
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
@@ -51,7 +48,16 @@ io.on('connection', (socket)=>{
     })
 
 })
+=======
+app.set('port', 3000);
 
-server.listen(app.get('port'), ()=>{
+const Router = require('./routes/router');
+const deviceRouter = require('./routes/device');
+
+app.use('/minimap', deviceRouter);
+app.use('/', Router);
+>>>>>>> parent of bb119f9 (Merge branch 'feature/astar' into 'develop')
+
+app.listen(app.get('port'), ()=>{
     console.log('listen...port : ', app.get('port'));
 });
