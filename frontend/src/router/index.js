@@ -5,6 +5,8 @@ import Login from "../views/Login.vue";
 import Header from "../views/Header.vue";
 import Footer from "../views/Footer.vue";
 import Voice from "../views/VoiceRecognition.vue";
+import Mypage from "../views/Mypage.vue";
+import Mainpage from "../views/Mainpage.vue";
 
 Vue.use(VueRouter);
 
@@ -33,6 +35,16 @@ const routes = [
     path: "/voice",
     name: "voice",
     component:Voice,
+  },
+  {
+    path: "/mypage",
+    name: "mypage",
+    component:Mypage,
+  },
+  {
+    path: "/main",
+    name: "main",
+    component:Mainpage
   }
 ];
 
