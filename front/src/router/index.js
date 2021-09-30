@@ -7,6 +7,8 @@ import Footer from "../views/Footer.vue";
 import Voice from "../views/VoiceRecognition.vue";
 import Mypage from "../views/Mypage.vue";
 import Mainpage from "../views/Mainpage.vue";
+import Delivery from "../views/Delivery.vue";
+import Control from "../views/Control.vue";
 
 Vue.use(VueRouter);
 
@@ -45,6 +47,16 @@ const routes = [
     path: "/main",
     name: "main",
     component:Mainpage
+  },
+  {
+    path: "/delivery",
+    name: "delivery",
+    component:Delivery,
+  },
+  {
+    path: "/control",
+    name: "control",
+    component:Control,
   }
 ];
 

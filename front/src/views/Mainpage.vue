@@ -1,7 +1,7 @@
 <template>
     <div class="mp_full container">
         <div class="mp_full container">
-            <h5>000님 안녕하세요</h5>
+            <h5 class="main_text">000님 안녕하세요</h5>
         </div>
         <div class="card main_card rounded-3" style="margin-bottom:8px;">
             <!--미니맵-->
@@ -25,9 +25,8 @@
 </template>
 
 <style>
-h5{
+.main_text{
     color: white;
-    font-weight: bold;
     margin-bottom: 0px;
 }
 .main_card{
