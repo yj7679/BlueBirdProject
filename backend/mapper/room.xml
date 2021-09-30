@@ -9,4 +9,10 @@
         ON r.room_number = e.room_number
         WHERE e.employee_number = ${employee_number}
     </select>
+    <!-- 방 이름을 넣으면 방 정보 조회 -->
+    <select id="searchRoomByRoomName" parameterType="int" resultType="Room">
+        SELECT r.room_number, r.name,r.x, r.y
+        From room r
+        WHERE r.name = ${name}
+    </select>
 </mapper>

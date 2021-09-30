@@ -15,7 +15,7 @@ export default {
     }
   },
   created() {
-    const socketClient = io.connect("http://localhost:3000");
+    const socketClient = io.connect("http://localhost:12001");
     console.log(socketClient);
     socketClient.on("connect", () => { 
       console.log("connection server");

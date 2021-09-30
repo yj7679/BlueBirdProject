@@ -6,6 +6,9 @@
 const path = require('path');
 const express = require('express');
 
+// const employee_service = require('./models/Employee');
+// const device_service = require('./models/Device');
+//const room_service = require('./models/Room');
 // client 경로의 폴더를 지정해줍니다.
 // const publicPath = path.join(__dirname, "/../client");
 var app = express();
@@ -32,12 +35,36 @@ const roomName = 'team';
 
 io.on('connection', socket => {
     socket.join(roomName);
-
+    console.log('connected');
     // 로직 3. 사용자의 메시지 수신시 WebClient로 메시지 전달
     socket.on('env_msg', (message) => {
         console.log(message);
         socket.to(roomName).emit('envMsg', message);
     });
+
+    // 용직 추가 Vue -> Server
+
+
+    //data = ""
+    socket.on('goToGoalToServer', (data) => {
+        console.log('목적지로 이동')
+        console.log('x,y', data)
+        // 음성 명령어에서 분리
+        const where = data.where;
+        // const what = data.what;
+        // const destination = data.destination;
+
+
+        console.log('search start room by name : ', where);
+        // room_service.getRoom(where).then((result) => {
+            
+        //     console.log('search start room x, y by name : ', result);
+        //     socket.to(roomName).emit('goToGoal', result);
+        // })
+
+ 
+    })
+    // 여기까지 용직 추가
 
     socket.on('PatrolStatus', (message) => {
         socket.to(roomName).emit('sendPatrolStatus', message);
