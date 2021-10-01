@@ -8,10 +8,11 @@
                 <h5 class="card-title">장소</h5>
                 <select class="form-select" aria-label="Default select example">
                     <option selected class="placeholder">물건을 가져올 장소를 선택해주세요.</option>
-                    <option value="1">세미나실</option>
+                    <option value="1">나에게서(from me)</option>
                     <option value="2">비품실</option>
                     <option value="3">회의실</option>
                     <option value="4">사무실</option>
+                    <option value="4">세미나실</option>
                 </select>
             </div>
             <div class="card-body">
@@ -28,9 +29,11 @@
                 <h5 class="card-title">목적지</h5>
                 <select class="form-select" aria-label="Default select example">
                     <option selected>목적지를 선택해주세요.</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
+                    <option value="1">나에게(to me)</option>
+                    <option value="2">비품실</option>
+                    <option value="3">회의실</option>
+                    <option value="4">사무실</option>
+                    <option value="4">세미나실</option>
                 </select>
             </div>
             <div class="container d-grid mb-3">
