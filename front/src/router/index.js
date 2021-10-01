@@ -9,6 +9,7 @@ import Mypage from "../views/Mypage.vue";
 import Mainpage from "../views/Mainpage.vue";
 import Delivery from "../views/Delivery.vue";
 import Control from "../views/Control.vue";
+import Notify from "../views/Notification.vue";
 
 Vue.use(VueRouter);
 
@@ -57,6 +58,11 @@ const routes = [
     path: "/control",
     name: "control",
     component:Control,
+  },
+  {
+    path: "/notify",
+    name: "notify",
+    component : Notify,
   }
 ];
 
