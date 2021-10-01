@@ -5,10 +5,11 @@
         </div>
         <div class="card rounded-3 card_size">
             <div class="card-body">
-                <ul 
-                v-for="(item,i) in notifications" :key={i} 
-                class="mb-5 list-group list-group-flush">
-                    <li class="list-group-item">{{item}}</li>
+                <ul class="mb-5 list-group list-group-flush">
+                    <li 
+                    v-for="(item,i) in notifications"
+                    :key={i} 
+                    class="list-group-item">{{item}}</li>
                 </ul>
             </div>
         </div>
@@ -23,7 +24,10 @@ export default {
         }
     },
     created() {
-        //알림 받아오기
+        //local storage 에 알림 받아오기
+        var tmp = JSON.parse(localStorage.getItem('notifications'));
+        //내림차순 설정
+        this.notifications = tmp.slice().reverse();
     },
 }
 </script>

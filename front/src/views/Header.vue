@@ -15,7 +15,7 @@
             <div class="col">
                 <a @click="goNotify" class="notification">
                     <img class="hd_img2" src="../assets/img/bell_simple_white.png" alt="Logo"> 
-                    <span class="badge">1</span>
+                    <span v-show="badgeshow" class="badge">1</span>
                 </a>
                 
             </div>
@@ -25,12 +25,29 @@
 
 <script>
 export default {
+    data() {
+        return {
+            badgeshow:false,
+        }
+    },
     methods: {
         goNotify(){
             this.$router.push('/notify');
         },
         goMain(){
             this.$router.push('/main')
+        }
+    },
+    created() {
+        var check = localStorage.getItem('update');
+        console.log(check)
+        if(check == 'true'){
+            //badge show
+            this.badgeshow = true;
+            localStorage.setItem('update','false');
+        }else {
+            this.badgeshow = false;
+            localStorage.setItem('update','false');
         }
     },
 }
@@ -69,6 +86,8 @@ export default {
   /* padding: 5px 10px; */
   border-radius: 50%;
   background:red;
-  color: white;
+  color: red;
+  width:5px;
+  height: 15px;
 }
 </style>

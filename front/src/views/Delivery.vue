@@ -45,9 +45,29 @@
 
 <script>
 export default {
+    data() {
+        return {
+            res : "SUCCESS", //임시 response
+        }
+    },
     methods: {
         goDelivery(){
+            //백엔드에 배달 요청
 
+
+            //백엔드에서 답변이 오면 localStorage에 set하기
+            var existingEntries = JSON.parse(localStorage.getItem('notifications'));
+            
+            if(this.res == "SUCCESS"){
+                existingEntries.push("배달에 성공하였습니다.");
+            }else if(this.res == "FAIL"){
+                existingEntries.push("물건을 찾지 못하였습니다.");
+            }else{
+                existingEntries.push("알 수 없는 오류로 물건배달에 실패하였습니다.");
+            }
+            localStorage.setItem('notifications',JSON.stringify(existingEntries));
+            //새로운 알림 badge추가용 data
+            localStorage.setItem('update','true');
         }
     },
 }
