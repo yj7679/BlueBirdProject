@@ -61,7 +61,6 @@ class iot_udp(Node):
         self.parsed_data=[]
         
         self.lock = threading.Lock()
-        self.countmsg = 0
 
         # 로직 2. 멀티스레드를 이용한 데이터 수신
         thread = threading.Thread(target=self.recv_udp_data)
@@ -70,6 +69,7 @@ class iot_udp(Node):
 
 
         self.is_recv_data=False
+        self.recv_data_time=datetime.datetime(1995,11,29,0,0,0)
 
         # os.system('cls')
         while True:
@@ -80,11 +80,18 @@ class iot_udp(Node):
             if menu == 0 :
                 self.scan()
             elif menu == 1:
-                pass
+                self.connect()
             elif menu == 2:
-                pass
+                print('Control Menu [0: ON, 1: OFF]')
+                ctrl = int(input())
+                if ctrl==0:
+                    self.control("SWITCH_ON")
+                elif ctrl==1:
+                    self.control("SWITCH_OFF")
+                else :
+                    print('wrong input')
             elif menu == 3:
-                pass
+                print(self.recv_data)
             else:
                 pass
 
@@ -94,61 +101,49 @@ class iot_udp(Node):
         '''
         로직 3. 수신 데이터 파싱
         '''
-
         header=raw_data[:19].decode('utf-8')
-        data_length=raw_data[19:23]
+        data_length=int.from_bytes(raw_data[19:23], "little")
         aux_data=raw_data[23:35]
 
-        # print("헤더: ", header)
-        # print("데이터 길이: ", data_length[0])
-        # print("aux_data: ", aux_data)
-
-        if header == '#Appliances-Status$' and data_length[0] == 20:
+        if header == '#Appliances-Status$' and data_length == 20:
             uid_pack=raw_data[35:51]
             uid=self.packet_to_uid(uid_pack)
         
             network_status=raw_data[51:53]
+            network_status=params_status[(network_status[0], network_status[1])]
+
             device_status=raw_data[53:55]
-            
-            print('uid : ', uid)
-            print('network : ', params_status[(network_status[0], network_status[1])])
-            print('device status : ',params_status[(device_status[0], device_status[1])])
+            device_status=params_status[(device_status[0], device_status[1])]
+
             self.is_recv_data=True
             self.recv_data=[uid,network_status,device_status]
-            
-            # print('1 sleep')
-            time.sleep(1)
-            print(self.countmsg, datetime.datetime.now())
-            self.is_recv_data=False
-            self.recv_data=['','','']
         
  
     def send_data(self,uid,cmd):
-        
-        pass
         '''
         로직 4. 데이터 송신 함수 생성
+        '''
 
- 
-        header=?
-        data_length=?
-        aux_data=?
-        self.upper=?
-        self.tail=?
+        header=b'#Ctrl-command$'
+        data_length=(18).to_bytes(4, byteorder='little')
+        aux_data=(0).to_bytes(12, byteorder='little')
+
+        self.upper= header + data_length + aux_data
+        self.tail=bytes([0x0D, 0x0A])
 
         uid_pack=self.uid_to_packet(uid)
+        cmd = params_control_cmd[cmd]
         cmd_pack=bytes([cmd[0],cmd[1]])
 
         send_data=self.upper+uid_pack+cmd_pack+self.tail
         self.sock.sendto(send_data,(self.ip,self.send_port))
-        '''
+        time.sleep(0.2)
 
 
     def recv_udp_data(self):
         while True :
-            # raw_data, sender = self.sock.recvfrom(self.data_size)
-            raw_data, sender = self.sock.recvfrom(64)
-            self.countmsg += 1
+            raw_data, sender = self.sock.recvfrom(self.data_size)
+            self.recv_data_time = datetime.datetime.now()
             self.data_parsing(raw_data)
 
             
@@ -179,18 +174,22 @@ class iot_udp(Node):
         주변에 들어오는 iot 데이터(uid,network status, device status)를 출력하세요.
 
         '''
-        print(self.is_recv_data)
-        # if self.is_recv_data is True:
-        #     print('uid : ', self.recv_data[0])
-        #     print('network : ', params_status[(self.recv_data[1][0], self.recv_data[1][1])])
-        #     print('device status : ', params_status[(self.recv_data[2][0], self.recv_data[2][1])])
-        # else :
-        #     print('no iot data')
+        # 주변에 데이터가 들어오고 있는지 체크한다.
+        # self.is_recv_data 를 이용해서 체크가능하다.
+        time_diff = datetime.datetime.now() - self.recv_data_time
+        if abs(time_diff.seconds >= 1):
+            self.is_recv_data = False
+            self.recv_data = [None, None, None] # recv data reset
+        
+        if self.is_recv_data is True:
+            print(self.recv_data[0], self.recv_data[1], self.recv_data[2])
+        else :
+            print('no iot data'))
         
                    
 
     def connect(self):
-        pass
+        
         '''
         로직 7. iot connect
 
@@ -198,18 +197,34 @@ class iot_udp(Node):
         나머지 상태일 때는 TRY_TO_CONNECT 명령을 보내서 iot에 접속하세요.
 
         '''
+        while self.recv_data[1] != 'CONNECTION':
+            con_cmd = ''
+            if self.recv_data[1]=='IDLE':
+                con_cmd = 'TRY_TO_CONNECT'
+            elif self.recv_data[1]=='CONNECTION_LOST':
+                con_cmd = 'RESET'
+            self.send_data(self.recv_data[0], con_cmd)
+            time.sleep(0.3)
+        print('connect success')
         
 
     
-    def control(self):
-
-        pass
+    def control(self, cmd):
         '''
         로직 8. iot control
         
         iot 디바이스 상태를 확인하고, ON 상태이면 OFF 명령을 보내고, OFF 상태면 ON 명령을 보내서,
         현재 상태를 토글시켜주세요.
         '''
+        if self.is_recv_data is True:
+            uid, network_status, device_status = self.recv_data
+            if cmd=='SWITCH_ON':
+                while self.recv_data[2] != 'ON':
+                    self.send_data(uid, cmd)
+            elif cmd=='SWITCH_OFF':
+                while self.recv_data[2] != 'OFF':
+                    self.send_data(uid, cmd)
+            
 
     def disconnect(self):
         if self.is_recv_data==True :
