@@ -1,20 +1,30 @@
 <template>
-    <div class="container">
-        <!--세로 중앙정렬이 안돼서 빈 container생성, 근데 px로 크기 지정해놔서 고치고 싶다..-->
-        <div class="container" style="height:220px;"></div>
-        <div class="d-flex align-items-center">
-        <img @click="testRecode" src="../assets/img/voice.png" style="margin:auto; width:170px;">
+    <div>
+        <Header />
+        <div class="container">
+            <!--세로 중앙정렬이 안돼서 빈 container생성, 근데 px로 크기 지정해놔서 고치고 싶다..-->
+            <div class="container" style="height:150px;"></div>
+            <div class="d-flex align-items-center">
+            <img @click="testRecode" src="../assets/img/voice.png" style="margin:auto; width:170px;">
+            </div>
+            <div class="vc_text container">
+                <h5 v-if="btnCheck">{{ voiceInput }}</h5>
+                <h5 v-else>{{ voiceCheck }}</h5>
+            </div>
         </div>
-        <div class="vc_text container">
-            <h5 v-if="btnCheck">{{ voiceInput }}</h5>
-            <h5 v-else>{{ voiceCheck }}</h5>
+        <div class="footer">
+            <Footer />
         </div>
     </div>
 </template>
 
 <script>
+import Header from "./Header.vue"
+import Footer from "./Footer.vue"
+
 export default {
     name: 'VoiceRecognition',
+    components: { Header, Footer },
     data() {
         return {
             btnCheck: true,
@@ -152,5 +162,9 @@ export default {
     text-align: center;
     color: white;
     font-weight: bold;
+}
+.footer{
+    position: fixed;
+    bottom: 0;
 }
 </style>

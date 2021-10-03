@@ -58,13 +58,13 @@ export default {
     margin-top: 10px;
     margin-left: 5px;
     padding: 5px;
-    width:50px;
+    width:45px;
 }
 .hd_img2 {
     margin-top : 10px;
     margin-right:5px;
     padding : 5px;
-    width:50px;
+    width:45px;
 }
 .notification {
   color: white;

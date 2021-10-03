@@ -50,6 +50,7 @@ export default {
     padding: 10px;
 }
 .ft_set{
-    background-color: hsl(0, 0%, 50%,0.1);
+    /* background-color: hsl(0, 0%, 50%,0.1); */
+    background-color: hsl(0, 0%, 0%, 0.1);
 }
 </style>
