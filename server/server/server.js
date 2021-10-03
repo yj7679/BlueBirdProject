@@ -50,6 +50,7 @@ io.on('connection', socket => {
         //console.log('목적지로 이동')
         //console.log('x,y', data)
         // 음성 명령어에서 분리
+        console.log(data);
         const command = {
             "depart" : data.depart,
             "stuff" : data.stuff,

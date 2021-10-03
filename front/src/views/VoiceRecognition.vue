@@ -20,8 +20,16 @@ export default {
             btnCheck: true,
             voiceCheck: '음성 인식 중',
             voiceInput: '클릭 후 명령하기',
-            roomList: ['세미나', '창고', '회의', '사무'],
+            roomList: ['세미나', '창고', '회의', '사무', '사장'],
             deviceList: ['에어컨', 'TV', '전등', '블라인드', '공기청정기'],
+            stuffList: ['가위', '물', '서류'],
+            findDepart: false,
+            findStuff: false,
+            sendErrandData: {
+                'depart': null,
+                'stuff': null,
+                'arrival': 'blueman'
+            }
         }
     },
     methods: {
@@ -61,8 +69,45 @@ export default {
         deviceControl(event) {
             console.log(event);
         },
-        errand(event) {
-            console.log(event);
+        errand() {
+            const slicing = this.voiceInput.split('에서')
+            if (slicing.length != 2) {
+                alert('잘못된 입력값입니다')
+                return
+            }
+            // depart 구하기
+            for (const depart of this.roomList) {
+                const departCheck = slicing[0].indexOf(depart)
+                if (departCheck != -1) {
+                    // console.log(depart);
+                    this.sendErrandData['depart'] = depart
+                    this.findDepart = true
+                }
+            }
+            //  stuff 구하기
+            for (const stuff of this.stuffList) {
+                const stuffCheck = slicing[1].indexOf(stuff)
+                if (stuffCheck != -1) {
+                    // console.log(stuff);
+                    this.sendErrandData['stuff'] = stuff
+                    this.findStuff = true
+                }
+            }
+            //  arrival 구하기
+            for (const arrival of this.roomList) {
+                const arrivalCheck = slicing[1].indexOf(arrival)
+                if (arrivalCheck != -1) {
+                    // console.log(arrival);
+                }
+            }
+            if (!this.findDepart || !this.findStuff) {
+                alert('회사에 없는 데이터입니다')
+                this.findDepart = false
+                this.findStuff = false
+                return
+            }
+            console.log(this.sendErrandData);
+            this.$socket.emit('stuffBring', (this.sendErrandData))
         }
     },
     mounted() {
