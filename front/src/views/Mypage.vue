@@ -5,16 +5,37 @@
         </div>
         <div class="card rounded-3 card_size">
             <div class="card-body">
-                <h5 class="mp_full card-title">000 대리</h5>
+                <h5 class="mp_full card-title">{{this.employee.name}}</h5>
                 <ul class="mb-5 list-group list-group-flush">
-                    <li class="list-group-item">사원번호</li>
-                    <li class="list-group-item">비밀번호</li>
-                    <li class="list-group-item">백엔드랑 정하기</li>
+                    <li class="list-group-item">사원번호 : {{this.employee.id}}</li>
+                    <li class="list-group-item">직급 : {{this.employee.job}}</li>
+                    <li class="list-group-item"></li>
                 </ul>
             </div>
         </div>
     </div>
 </template>
+
+<script>
+export default {
+    data() {
+        return {
+            employee:{
+                id:"",
+                name:"",
+                job:"",
+            }
+        }
+    },
+    created() {
+        this.$socket.on('employee',(data)=>{
+            this.employee.id = data.id;
+            this.employee.name = data.name;
+            this.employee.job = data.job;
+        })
+    },
+}
+</script>
 
 <style>
 .mp_full{
