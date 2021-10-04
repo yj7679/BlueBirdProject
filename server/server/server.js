@@ -6,7 +6,7 @@
 const path = require('path');
 const express = require('express');
 
-// const employee_service = require('./models/Employee');
+const employee_service = require('./models/Employee');
 const device_service = require('./models/Device');
 const room_service = require('./models/Room');
 // client 경로의 폴더를 지정해줍니다.
@@ -38,7 +38,17 @@ io.on('connection', socket => {
     console.log('connected');
     
     // Login
-    
+    socket.on('join', (data) => {
+        employee_service.loginEmployee(data).then((result) => {
+            // const loginCheck = 0
+            if (result[0]) {
+                // loginCheck = true
+                // loginCheck = result[0]['employee_number']
+                console.log(result[0]['employee_number']);
+            }
+            socket.emit('login', result)
+        })
+    })
 
     // Vue -> Server
 

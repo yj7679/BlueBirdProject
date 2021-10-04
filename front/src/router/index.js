@@ -26,42 +26,42 @@ const routes = [
   },
   {
     path: "/header",
-    name: "header",
+    name: "Header",
     component:Header,
   },
   {
     path: "/footer",
-    name: "footer",
+    name: "Footer",
     component:Footer,
   },
   {
     path: "/voice",
-    name: "voice",
+    name: "Voice",
     component:Voice,
   },
   {
     path: "/mypage",
-    name: "mypage",
+    name: "Mypage",
     component:Mypage,
   },
   {
     path: "/main",
-    name: "main",
+    name: "Mainpage",
     component:Mainpage
   },
   {
     path: "/delivery",
-    name: "delivery",
+    name: "Delivery",
     component:Delivery,
   },
   {
     path: "/control",
-    name: "control",
+    name: "Control",
     component:Control,
   },
   {
     path: "/notify",
-    name: "notify",
+    name: "Notify",
     component : Notify,
   }
 ];

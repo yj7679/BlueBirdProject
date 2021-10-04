@@ -11,7 +11,7 @@
             <form action="/action_page.php">
                 <div class="form-group">
                     <label for="number">사원번호:</label>
-                    <input v-model="employee.id" type="number" class="form-control" placeholder="사원번호를 입력하세요" id="email">
+                    <input v-model="employee.employee_number" type="number" class="form-control" placeholder="사원번호를 입력하세요" id="email">
                 </div>
                 <div class="form-group pt-2">
                     <label for="pwd">비밀번호:</label>
@@ -31,12 +31,14 @@
 </template>
 
 <script>
+import router from "@/router"
+
 export default {
     name: 'login',
     data() {
         return {
             employee:{
-                id:"",
+                employee_number:"",
                 password:"",
             }
         }
@@ -46,6 +48,17 @@ export default {
             this.$socket.emit('join',this.employee);
         }
     },
+    mounted() {
+        this.$socket.on('login', (data) => {
+            if (data[0]) {
+                localStorage.setItem('employee_number', data[0]['employee_number'])
+                router.push({name: 'Mainpage'})
+            } else {
+                localStorage.removeItem('employee_number')
+                alert('회원정보가 일치하지 않습니다')
+            }
+        })
+    }
 }
 </script>
 
