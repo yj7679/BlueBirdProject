@@ -58,8 +58,9 @@ export default {
             //백엔드에서 답변이 오면 localStorage에 set하기
             var existingEntries = JSON.parse(localStorage.getItem('notifications'));
             
+            //현재시간도 같이 넣으면 좋을 듯
             if(this.res == "SUCCESS"){
-                existingEntries.push("배달에 성공하였습니다.");
+                existingEntries.push("현재시간"+"배달에 성공하였습니다.");
             }else if(this.res == "FAIL"){
                 existingEntries.push("물건을 찾지 못하였습니다.");
             }else{

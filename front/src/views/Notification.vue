@@ -4,9 +4,9 @@
             <h4 class="mypage_text">알림</h4>
         </div>
         <div class="card rounded-3 card_size">
-            <div class="card-body">
+            <div class="scroll_set card-body">
                 <ul class="mb-5 list-group list-group-flush">
-                    <li 
+                    <li
                     v-for="(item,i) in notifications"
                     :key={i} 
                     class="list-group-item">{{item}}</li>
@@ -31,3 +31,11 @@ export default {
     },
 }
 </script>
+
+<style>
+.scroll_set {
+    /*여기서는 height를 %로 주면 scroll이 적용이 안 됨 ㅠ */
+    height: 400px;
+    overflow-y: scroll;
+}
+</style>
