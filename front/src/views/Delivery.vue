@@ -6,34 +6,35 @@
         <div class="card rounded-3 card_size">
             <div class="card-body">
                 <h5 class="card-title">장소</h5>
-                <select class="form-select" aria-label="Default select example">
-                    <option selected class="placeholder">물건을 가져올 장소를 선택해주세요.</option>
-                    <option value="1">나에게서(from me)</option>
-                    <option value="2">비품실</option>
-                    <option value="3">회의실</option>
-                    <option value="4">사무실</option>
-                    <option value="4">세미나실</option>
+                <select v-model="value.depart" class="form-select" aria-label="Default select example">
+                    <option disabled value="">물건을 가져올 장소를 선택해주세요.</option>
+                    <option value="나에게서">나에게서(from me)</option>
+                    <option value="비품실">비품실</option>
+                    <option value="회의실">회의실</option>
+                    <option value="사무실">사무실</option>
+                    <option value="세미나실">세미나실</option>
+                    <option value="사장실">사장실</option>
                 </select>
             </div>
             <div class="card-body">
                 <h5 class="card-title">물건</h5>
-                <select class="form-select" aria-label="Default select example">
-                    <option selected>배달할 물건을 선택해주세요.</option>
-                    <!--1번 선택지에 따라서 결과가 다르게 출력되도록 해야함-->
-                    <option value="1">물</option>
-                    <option value="2">서류철</option>
-                    <option value="3">박스</option>
+                <select v-model="value.stuff" class="form-select" aria-label="Default select example">
+                    <option disabled value="">배달할 물건을 선택해주세요.</option>
+                    <option value="물">물</option>
+                    <option value="서류철">서류철</option>
+                    <option value="박스">박스</option>
                 </select>
             </div>
             <div class="card-body">
                 <h5 class="card-title">목적지</h5>
-                <select class="form-select" aria-label="Default select example">
-                    <option selected>목적지를 선택해주세요.</option>
-                    <option value="1">나에게(to me)</option>
-                    <option value="2">비품실</option>
-                    <option value="3">회의실</option>
-                    <option value="4">사무실</option>
-                    <option value="4">세미나실</option>
+                <select v-model="value.arrival" class="form-select" aria-label="Default select example">
+                    <option disabled value="">목적지를 선택해주세요.</option>
+                    <option value="나에게">나에게(to me)</option>
+                    <option value="비품실">비품실</option>
+                    <option value="회의실">회의실</option>
+                    <option value="사무실">사무실</option>
+                    <option value="세미나실">세미나실</option>
+                    <option value="사장실">사장실</option>
                 </select>
             </div>
             <div class="container d-grid mb-3">
@@ -47,28 +48,18 @@
 export default {
     data() {
         return {
-            res : "SUCCESS", //임시 response
+            // res : "SUCCESS", //임시 response
+            value:{
+                depart : "",
+                stuff:"",
+                arrival:"",
+            }
         }
     },
     methods: {
         goDelivery(){
             //백엔드에 배달 요청
-
-
-            //백엔드에서 답변이 오면 localStorage에 set하기
-            var existingEntries = JSON.parse(localStorage.getItem('notifications'));
-            
-            //현재시간도 같이 넣으면 좋을 듯
-            if(this.res == "SUCCESS"){
-                existingEntries.push("현재시간"+"배달에 성공하였습니다.");
-            }else if(this.res == "FAIL"){
-                existingEntries.push("물건을 찾지 못하였습니다.");
-            }else{
-                existingEntries.push("알 수 없는 오류로 물건배달에 실패하였습니다.");
-            }
-            localStorage.setItem('notifications',JSON.stringify(existingEntries));
-            //새로운 알림 badge추가용 data
-            localStorage.setItem('update','true');
+            this.$socket.emit('stuffBring',this.value);
         }
     },
 }

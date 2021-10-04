@@ -11,7 +11,7 @@
                 aria-label="Default select example"
                 @change="onChange($event)">
                     <option selected class="placeholder">장소를 선택해주세요.</option>
-                    <option value="1">세미나실</option>
+                    <option value="세미나실">세미나실</option>
                     <option value="2">창고</option>
                     <option value="3">회의실</option>
                     <option value="4">사무실</option>
@@ -21,7 +21,7 @@
             <div class="container">
                 <div class="row">
                     <div class="ct_text col" style="text-align:center;">
-                        <p class="print_text">{{this.printvalue}}</p>
+                        <p class="print_text">{{this.value.device_name}}</p>
                     </div>
                     <div class="switch_pad col" v-show="showtext">
                     <!-- <div class="d-flex justify-content-center col form-check form-switch">
@@ -40,8 +40,12 @@
 export default {
     data() {
         return {
+            value:{
+                room_name:"",
+                device_name :"",
+
+            },
             selectvalue:"",
-            printvalue:"",
             showtext:false,
         }
     },
@@ -52,39 +56,43 @@ export default {
 
             switch (this.selectvalue) {
                 case "1":
-                    this.printvalue = "공기청정기";
+                    this.value.room_name = "세미나실";
+                    this.value.device_name = "공기청정기";
                     this.showtext = true;
                     break;
                 case "2":
-                    this.printvalue = "해당 장소에 제어할 수 있는 기기가 없습니다.";
+                    this.value.room_name = "창고";
+                    this.value.device_name = "해당 장소에 제어할 수 있는 기기가 없습니다.";
                     this.showtext = false;
                     break;
                 case "3":
-                    this.printvalue = "에어컨";
+                    this.value.room_name = "회의실";
+                    this.value.device_name = "에어컨";
                     this.showtext = true;
                     break;
                 case "4":
-                    this.printvalue = "TV";
+                    this.value.room_name = "사무실";
+                    this.value.device_name = "TV";
                     this.showtext = true;
                     break;
                 case "5":
-                    this.printvalue = "해당 장소에 제어할 수 있는 기기가 없습니다.";
-                    this.showtext = false;
+                    this.value.room_name = "사장실";
+                    this.value.device_name = "에어컨";
+                    this.showtext = true;
                     break;
                 default:
-                    this.printvalue = "해당 장소에 제어할 수 있는 기기가 없습니다.";
+                    this.value.room_name = "default";
+                    this.value.device_name = "해당 장소에 제어할 수 있는 기기가 없습니다.";
                     this.showtext = false;
                     break;
             }
         },
         on(){
             //상태를 받고 on 전달
-            //text전달하고 room.xml에 text로 roomnumber 찾고 그 뒤에 처리 아닌가? 
-            //만약에 room.xml로 처리되는거면 deviceOn명령으로 처리되는 것도 맞는지 물어보기
-            this.$socket.emit('deviceOn',this.printvalue);
+            this.$socket.emit('deviceOn',this.value);
         },
         off(){
-            this.$socket.emit('deviceOff',this.printvalue);
+            this.$socket.emit('deviceOff',this.value);
         },
     },
     watch:{
