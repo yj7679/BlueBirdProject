@@ -7,7 +7,7 @@ const path = require('path');
 const express = require('express');
 
 // const employee_service = require('./models/Employee');
-// const device_service = require('./models/Device');
+const device_service = require('./models/Device');
 const room_service = require('./models/Room');
 // client 경로의 폴더를 지정해줍니다.
 // const publicPath = path.join(__dirname, "/../client");
@@ -45,7 +45,16 @@ io.on('connection', socket => {
     // 기기 제어 On
     // data: {"room_name": , "device_name": }
     socket.on('deviceOn', (data) => {
-        console.log(data, 'on');
+        const dataToROS = {};
+
+        device_service.onDevice(data).then((result)=>{
+            // console.log(result[0].x);
+            // dataToROS = {};
+            // dataToROS['arrival'] = { "x": result[0].x, "y": result[0].y };
+            
+            // console.log(dataToROS);
+        })
+
     })
 
     // 기기 제어 Off
@@ -108,11 +117,18 @@ io.on('connection', socket => {
         socket.to(roomName).emit('env_msg_response_web', msg);
     })
 
-    socket.on('bot_status_response', (msg)=>{
-        console.log('bot status response : ', msg);
-        
+    socket.on('bot_status_request_web', ()=>{
+        socket.to(roomName).emit('bot_status_request_ros');
+    })
+
+    socket.on('bot_status_response_ros', (msg)=>{
+        socket.to(roomName).emit('bot_status_response_ros', msg);
     })
     
+    socket.on('employee_request_web', (msg)=>{
+        socket.to(roomName).emit('employee_request_ros',msg);
+    })
+
     socket.on('disconnect', () => {
         console.log('disconnected from server');
     });

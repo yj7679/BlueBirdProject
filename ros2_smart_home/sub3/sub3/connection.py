@@ -33,9 +33,9 @@ class connection(Node):
         self.working_status_pub = self.create_publisher(Int16,'working_status',10)
         self.want_stuff_pub = self.create_publisher(Int8,'want_stuff',10)
 
-        thread = threading.Thread(target=self.status_pub_timer)
-        thread.daemon = True 
-        thread.start() 
+        # thread = threading.Thread(target=self.status_pub_timer)
+        # thread.daemon = True 
+        # thread.start() 
 
         # 목표지점이 변경 될 때마다 값을 읽어와야함
         self.timer = self.create_timer(1, self.goal_callback)

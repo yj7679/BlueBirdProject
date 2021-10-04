@@ -19,7 +19,7 @@ module.exports = {
         });
     },
     onDevice : function(data){
-        const query = mybatisMapper.getStatement('device', 'onDeviceByPK', data);
+        const query = mybatisMapper.getStatement('device', 'searchDevice', data);
         return new Promise((resolve, reject)=>{
             db.query(query, (err, result, fields)=>{
                 if(err){
@@ -27,7 +27,15 @@ module.exports = {
                     reject(err);
                 }
                 else{
-                    resolve(result);
+                    // rawdatapacket to json
+                    let ret = Object.values(JSON.parse(JSON.stringify(result)))
+
+                    // no data : return null
+                    if(Array.isArray(ret)&&ret.length===0){
+                        ret = null;
+                    }
+
+                    resolve(ret);
                 }
             });
         });

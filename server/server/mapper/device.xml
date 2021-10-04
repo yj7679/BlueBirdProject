@@ -8,18 +8,15 @@
         FROM device
         WHERE room_number = #{room_number};
     </select>
-    <!-- 특정 기기 켜기 -->
-    <update id="onDeviceByPK" parameterType="int" resultType="boolean">
-        UPDATE device
-        SET is_on = 1
-        WHERE device_number = #{device_number}
-    </update>
-    
-    <!-- 특정 기기 끄기 -->
-    <update id="offDeviceByPK" parameterType="int" resultType="boolean">
-        UPDATE device
-        SET is_on = 0
-        WHERE device_number = #{device_number}
-    </update>
+
+    <!-- 특정 기기 위치 -->
+    <select id="searchDevice">
+        SELECT d.name, d.x, d.y
+        FROM device d
+        WHERE room_number in 
+            (SELECT room_number 
+            FROM room 
+            WHERE name = #{room_name}) AND name = #{device_name};
+    </select>
         
 </mapper>
