@@ -83,25 +83,38 @@ io.on('connection', socket => {
         //console.log('search start room by name : ', command['depart']);
         room_service.getRoom(depart).then((result) => {
 
-            var temp =  Object.values(JSON.parse(JSON.stringify(result)))
+            console.log(result);
             
-            dataToROS['depart'] = { "x": temp[0].x, "y": temp[0].y }
-            dataToROS['stuff'] = stuff
-            room_service.getRoom(arrival).then((result) => {
-                var temp =  Object.values(JSON.parse(JSON.stringify(result)))
-
-                dataToROS['arrival'] = { "x": temp[0].x, "y": temp[0].y }
-                
-                console.log("ROS2(Client.py)로 보내는 데이터: ", dataToROS);
-                socket.to(roomName).emit('stuffBringToROS', dataToROS);
-                
-            })
+            if(result !== null){
+                dataToROS['depart'] = { "x": result[0].x, "y": result[0].y }
+                dataToROS['stuff'] = stuff
+                room_service.getRoom(arrival).then((result) => {
+                    var temp =  Object.values(JSON.parse(JSON.stringify(result)))
+    
+                    dataToROS['arrival'] = { "x": temp[0].x, "y": temp[0].y };
+                    
+                    console.log("ROS2(Client.py)로 보내는 데이터: ", dataToROS);
+                    socket.to(roomName).emit('stuffBringToROS', dataToROS);
+                })
+            }
         })
-
-
- 
     })
 
+    socket.on('env_msg_request', () => {
+        console.log('server get env msg req');
+        socket.to(roomName).emit('env_msg_request');
+    }); 
+    
+    socket.on('env_msg_response', (msg)=>{
+        console.log('ros response : ', msg);
+        socket.to(roomName).emit('env_msg_response', msg);
+    })
+
+    socket.on('bot_status_response', (msg)=>{
+        console.log('bot status response : ', msg);
+        
+    })
+    
     socket.on('disconnect', () => {
         console.log('disconnected from server');
     });

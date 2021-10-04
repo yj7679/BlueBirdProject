@@ -18,7 +18,9 @@
     "express": "^4.17.1",
     "mybatis-mapper": "^0.6.5",
     "mysql": "^2.18.1",
-    "nodemon": "^2.0.4",
     "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.13"
   }
 }

@@ -28,15 +28,12 @@ class client(Node):
         self.working_status_msg.data = 0
 
 
-
         @self.sio.event
         def connect():
             conMod_thread = threading.Thread(target=startConn, args=[conn])
             conMod_thread.daemon = True
             conMod_thread.start()
             print('connection established')
-
-
 
         @self.sio.on('stuffBringToROS')
         def stuffBringStart(data):
@@ -57,11 +54,21 @@ class client(Node):
             # tf_test
             self.working_status_msg.data = 0b111
             self.working_status_pub.publish(self.working_status_msg)
-
+        
+        @self.sio.on('env_msg_request')
+        def envRequest():
+            print('server emit env_msg_request!')
+            env_msg_response = dict()
+            env_msg_response['weather'] = conn.env_data.weather
+            env_msg_response['temperature'] = conn.env_data.temperature
+            
+            print('env response : ',env_msg_response)
+            self.sio.emit('env_msg_response', env_msg_response)
 
         @self.sio.event
         def disconnect():
             print('disconnected from server')
+        
 
         self.sio.connect('http://localhost:12001/')
 
@@ -71,7 +78,7 @@ def main(args=None):
         client_run = client()
 
     except KeyboardInterrupt:
-        
+        rclpy.spin(client_run)
         client_run.destroy_node()
         rclpy.shutdown()
         exit()

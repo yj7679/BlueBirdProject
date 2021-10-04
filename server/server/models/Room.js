@@ -14,7 +14,15 @@ module.exports = {
                     reject(err);
                 }
                 else{
-                    resolve(result);
+                    // rawdatapacket to json
+                    let ret = Object.values(JSON.parse(JSON.stringify(result)))
+
+                    // no data : return null
+                    if(Array.isArray(ret)&&ret.length===0){
+                        ret = null;
+                    }
+
+                    resolve(ret);
                 }
             });
         });
