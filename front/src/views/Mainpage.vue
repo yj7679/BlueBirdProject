@@ -23,8 +23,10 @@
                 </div>
             </div>
             <div class="col" style="padding-left:3px;">
-                <div class="card sub_card rounded-3">
+                <div class="card sub_card rounded-3 container px-0">
                     <!--날씨-->
+                    <img :src="require(`@/assets/img/${weather}.png`)" class="mx-auto p-0 img-size" v-if="weather != null" />
+                    <h4 class="text-center mb-0">{{ temperature }}°C</h4>
                 </div>
             </div>
         </div>
@@ -41,7 +43,9 @@ export default {
         return {
             date: null,
             time: null,
-            day: null
+            day: null,
+            weather: null,
+            temperature: null
         }
     },
     created() {
@@ -60,10 +64,11 @@ export default {
         this.date = date
         this.time = time
         this.day = day[today.getDay()]
-        // this.$socket.emit('env_msg_request_web', 'go')
-        // this.$socket.on('env_msg_response_web', (data) => {
-        //     console.log(data);
-        // })
+        this.$socket.emit('env_msg_request_web', 'go')
+        this.$socket.on('env_msg_response_web', (data) => {
+            this.weather = data.weather
+            this.temperature = data.temperature
+        })
     },
     mounted() {
         setInterval(() => {
@@ -84,11 +89,8 @@ export default {
             this.day = day[today.getDay()]
 
             this.$socket.emit('env_msg_request_web', 'go')
-            this.$socket.on('env_msg_response_web', (data) => {
-                console.log(data);
-            })
         }, 1000);
-    }
+    },
 }
 </script>
 
@@ -109,5 +111,8 @@ export default {
 }
 .calendar_size{
     width: 30%;
+}
+.img-size{
+    width: 40%;
 }
 </style>
