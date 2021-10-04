@@ -20,9 +20,9 @@
 
     <!-- 유저 번호를 넣으면 유저의 정보를 모두 리턴 -->
     <select id="searchEmployeeByPK" parameterType="int" resultType="map">
-        SELECT e.id, e.name, e.company, e.department, e.job, e.x, e.y
+        SELECT e.employee_number, e.name, e.company, e.department, e.job, e.x, e.y
         FROM employee e
-        WHERE employee_number = #{employee_number}
+        WHERE e.employee_number = #{employee_number}
     </select>
 
 </mapper>

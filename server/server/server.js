@@ -52,8 +52,10 @@ io.on('connection', socket => {
 
     // GetEmployee
     socket.on('employee', (data) => {
+        console.log(data);
         employee_service.getEmployee(data).then((result) => {
             socket.emit('putEmployee', result)
+            console.log(result);
         })
     })
 

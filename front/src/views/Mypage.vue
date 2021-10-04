@@ -28,19 +28,25 @@ export default {
                 company:"",
                 department:"",
                 job:"",
+            },
+            data:{
+                employee_number:null,
             }
         }
     },
     created() {
-        var employee_number = JSON.parse(localStorage.getItem('employee_number'));
+        localStorage.setItem('employee_number',1);
+        this.data["employee_number"] = localStorage.getItem('employee_number');
 
-        this.$socket.emit('employee',employee_number,(data)=>{
-            this.employee.id = data.employee_number;
-            this.employee.name = data.name;
-            this.employee.company = data.company;
-            this.employee.department = data.department;
-            this.employee.job = data.job;
+        this.$socket.emit('employee',this.data)
+        this.$socket.on('putEmployee',(data)=>{
+            this.employee.number = data[0].employee_number;
+            this.employee.name = data[0].name;
+            this.employee.company = data[0].company;
+            this.employee.department = data[0].department;
+            this.employee.job = data[0].job;
         })
+            console.log(this.employee)
     },
 }
 </script>
