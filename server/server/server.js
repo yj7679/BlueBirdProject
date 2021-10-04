@@ -50,6 +50,13 @@ io.on('connection', socket => {
         })
     })
 
+    // GetEmployee
+    socket.on('employee', (data) => {
+        employee_service.getEmployee(data).then((result) => {
+            socket.emit('putEmployee', result)
+        })
+    })
+
     // Vue -> Server
 
     // 기기 제어 On
