@@ -25,8 +25,8 @@
             <div class="col" style="padding-left:3px;">
                 <div class="card sub_card rounded-3 container px-0">
                     <!--날씨-->
-                    <img :src="require(`@/assets/img/${weather}.png`)" class="mx-auto p-0 img-size" v-if="weather != null" />
-                    <h4 class="text-center mb-0">{{ temperature }}°C</h4>
+                    <img :src="require(`@/assets/img/${weather}.png`)" class="mx-auto mt-1 p-0 img-size" v-if="weather != null" />
+                    <h4 class="text-center mb-0 mt-2">{{ temperature }}°C</h4>
                 </div>
             </div>
         </div>
@@ -113,6 +113,6 @@ export default {
     width: 30%;
 }
 .img-size{
-    width: 40%;
+    width: 35%;
 }
 </style>

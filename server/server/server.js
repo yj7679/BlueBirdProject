@@ -36,11 +36,9 @@ const roomName = 'team';
 io.on('connection', socket => {
     socket.join(roomName);
     console.log('connected');
-    // 로직 3. 사용자의 메시지 수신시 WebClient로 메시지 전달
-    socket.on('env_msg', (message) => {
-        console.log(message);
-        socket.to(roomName).emit('envMsg', message);
-    });
+    
+    // Login
+    
 
     // Vue -> Server
 

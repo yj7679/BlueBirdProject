@@ -15,7 +15,7 @@
     <select id="loginEmployee" parameterType="map" resultType="int">
         SELECT employee_number
         FROM employee
-        WHERE id = #{id} and password = #{password}
+        WHERE employee_number = #{employee_number} and password = #{password}
     </select>
 
     <!-- 유저 번호를 넣으면 유저의 정보를 모두 리턴 -->
