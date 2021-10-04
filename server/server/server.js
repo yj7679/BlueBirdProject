@@ -44,8 +44,20 @@ io.on('connection', socket => {
 
     // Vue -> Server
 
+    // 기기 제어 On
+    // data: {"room_name": , "device_name": }
+    socket.on('deviceOn', (data) => {
+        console.log(data, 'on');
+    })
 
-    //data = ""
+    // 기기 제어 Off
+    // data: {"room_name": , "device_name": }
+    socket.on('deviceOff', (data) => {
+        console.log(data, 'off');
+    })
+
+    // 심부름
+    //data = {"depart": , "stuff": , "arrival": }
     socket.on('stuffBring', (data) => {
         //console.log('목적지로 이동')
         //console.log('x,y', data)

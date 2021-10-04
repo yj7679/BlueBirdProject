@@ -11,7 +11,7 @@
                 aria-label="Default select example"
                 @change="onChange($event)">
                     <option selected class="placeholder">장소를 선택해주세요.</option>
-                    <option value="세미나실">세미나실</option>
+                    <option value="1">세미나실</option>
                     <option value="2">창고</option>
                     <option value="3">회의실</option>
                     <option value="4">사무실</option>
@@ -56,8 +56,8 @@ export default {
 
             switch (this.selectvalue) {
                 case "1":
-                    this.value.room_name = "세미나실";
-                    this.value.device_name = "공기청정기";
+                    this.value.room_name = "세미나";
+                    this.value.device_name = "공기 청정기";
                     this.showtext = true;
                     break;
                 case "2":
@@ -66,18 +66,18 @@ export default {
                     this.showtext = false;
                     break;
                 case "3":
-                    this.value.room_name = "회의실";
+                    this.value.room_name = "회의";
                     this.value.device_name = "에어컨";
                     this.showtext = true;
                     break;
                 case "4":
-                    this.value.room_name = "사무실";
-                    this.value.device_name = "TV";
+                    this.value.room_name = "사무";
+                    this.value.device_name = "에어컨";
                     this.showtext = true;
                     break;
                 case "5":
-                    this.value.room_name = "사장실";
-                    this.value.device_name = "에어컨";
+                    this.value.room_name = "사장";
+                    this.value.device_name = "TV";
                     this.showtext = true;
                     break;
                 default:
