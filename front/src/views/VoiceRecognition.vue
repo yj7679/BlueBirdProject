@@ -5,7 +5,7 @@
             <!--세로 중앙정렬이 안돼서 빈 container생성, 근데 px로 크기 지정해놔서 고치고 싶다..-->
             <div class="container" style="height:150px;"></div>
             <div class="d-flex align-items-center">
-            <img @click="testRecode" src="../assets/img/voice.png" style="margin:auto; width:170px;">
+            <img @click="voiceRecognition" src="../assets/img/voice.png" style="margin:auto; width:170px;">
             </div>
             <div class="vc_text container">
                 <h5 v-if="btnCheck">{{ voiceInput }}</h5>
@@ -31,22 +31,22 @@ export default {
             voiceCheck: '음성 인식 중',
             voiceInput: '클릭 후 명령하기',
             roomList: ['세미나', '창고', '회의', '사무', '사장'],
-            deviceList: ['에어컨', 'TV', '전등', '블라인드', '공기청정기'],
-            stuffList: ['가위', '물', '서류'],
+            deviceList: ['에어컨', 'TV', '공기 청정기'],
+            stuffList: ['박스', '물', '서류'],
             findDepart: false,
             findStuff: false,
             sendErrandData: {
                 'depart': null,
                 'stuff': null,
                 'arrival': 'blueman'
+            },
+            sendDeviceData: {
+                'device_name': null,
+                'room_name': '사무'
             }
         }
     },
     methods: {
-        testRecode() {
-            // this.voiceInput = '에어컨 켜줘'
-            this.voiceInput = '사무실에서 가위 좀 회의실에 갖다 놔'
-        },
         voiceRecognition() {
             this.btnCheck = false
             var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -76,13 +76,67 @@ export default {
             recognition.start();
         
         },
-        deviceControl(event) {
-            console.log(event);
+        deviceControl(device) {
+            // 사물, 위치 찾기
+            this.sendDeviceData['device_name'] = device
+
+            for (const room of this.roomList) {
+                const roomCheck = this.voiceInput.indexOf(room)
+                if (roomCheck != -1) {
+                    this.sendDeviceData['room_name'] = room
+                }
+            }
+            if (device == '공기 청정기') {
+                if (this.sendDeviceData['room_name'] != '세미나') {
+                    this.sendDeviceData['device_name'] = null
+                    this.sendDeviceData['room_name'] = '사무'
+                    alert('해당 장소에 해당 기기가 없습니다')
+                    return
+                }
+            }
+            else if (device == 'TV') {
+                if (this.sendDeviceData['room_name'] != '사장') {
+                    this.sendDeviceData['device_name'] = null
+                    this.sendDeviceData['room_name'] = '사무'
+                    alert('해당 장소에 해당 기기가 없습니다')
+                    return
+                }
+            }
+            else {
+                if ((this.sendDeviceData['room_name'] == '회의') || (this.sendDeviceData['room_name'] == '사무')) {
+                    this.sendDeviceData
+                }
+                else {
+                    this.sendDeviceData['device_name'] = null
+                    this.sendDeviceData['room_name'] = '사무'
+                    alert('해당 장소에 해당 기기가 없습니다')
+                    return
+                }
+            }
+
+            // 어떤 명령인지 파악하기
+            // Device On
+            if (this.voiceInput.indexOf('켜') != -1) {
+                this.$socket.emit('deviceOn', (this.sendDeviceData))
+            }
+            else if (this.voiceInput.indexOf('꺼') != -1) {
+                this.$socket.emit('deviceOff', (this.sendDeviceData))
+            }
+            else {
+                alert('잘못된 명령입니다')
+            }
+            this.sendDeviceData['device_name'] = null
+            this.sendDeviceData['room_name'] = '사무'
         },
         errand() {
-            const slicing = this.voiceInput.split('에서')
+            const slicing = this.voiceInput.split('에')
             if (slicing.length != 2) {
-                alert('잘못된 입력값입니다')
+                alert('잘못된 명령입니다')
+                this.findDepart = false
+                this.findStuff = false
+                this.sendErrandData['depart'] = null
+                this.sendErrandData['stuff'] = null
+                this.sendErrandData['arrival'] = 'blueman'
                 return
             }
             // depart 구하기
@@ -110,14 +164,29 @@ export default {
                     // console.log(arrival);
                 }
             }
-            if (!this.findDepart || !this.findStuff) {
-                alert('회사에 없는 데이터입니다')
+            if (!this.findDepart) {
+                alert('회사에 없는 방입니다')
                 this.findDepart = false
                 this.findStuff = false
+                this.sendErrandData['depart'] = null
+                this.sendErrandData['stuff'] = null
+                this.sendErrandData['arrival'] = 'blueman'
+                return
+            }
+            else if (!this.findStuff) {
+                alert('회사에 없는 물건입니다')
+                this.findDepart = false
+                this.findStuff = false
+                this.sendErrandData['depart'] = null
+                this.sendErrandData['stuff'] = null
+                this.sendErrandData['arrival'] = 'blueman'
                 return
             }
             console.log(this.sendErrandData);
             this.$socket.emit('stuffBring', (this.sendErrandData))
+            this.sendErrandData['depart'] = null
+            this.sendErrandData['stuff'] = null
+            this.sendErrandData['arrival'] = 'blueman'
         }
     },
     mounted() {
@@ -139,7 +208,7 @@ export default {
             for(const device of this.deviceList) {
                 const deviceCheck = this.voiceInput.indexOf(device)
                 if (deviceCheck != -1) {
-                    this.deviceControl(this.voiceInput)
+                    this.deviceControl(device)
                     return
                 }
             }
