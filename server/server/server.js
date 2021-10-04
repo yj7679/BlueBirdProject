@@ -75,7 +75,7 @@ io.on('connection', socket => {
 
     // 심부름
     //data = {"depart": , "stuff": , "arrival": }
-    socket.on('stuffBring', (data) => {
+    socket.on('stuffBring', async (data) => {
         //console.log('목적지로 이동')
         //console.log('x,y', data)
         // 음성 명령어에서 분리
@@ -98,23 +98,17 @@ io.on('connection', socket => {
         const dataToROS = {};
 
         //console.log('search start room by name : ', command['depart']);
-        room_service.getRoom(depart).then((result) => {
 
-            console.log(result);
-            
-            if(result !== null){
-                dataToROS['depart'] = { "x": result[0].x, "y": result[0].y }
-                dataToROS['stuff'] = stuff
-                room_service.getRoom(arrival).then((result) => {
-                    var temp =  Object.values(JSON.parse(JSON.stringify(result)))
-    
-                    dataToROS['arrival'] = { "x": temp[0].x, "y": temp[0].y };
-                    
-                    console.log("ROS2(Client.py)로 보내는 데이터: ", dataToROS);
-                    socket.to(roomName).emit('stuffBringToROS', dataToROS);
-                })
-            }
-        })
+        const depart_result = await room_service.getRoom(depart);
+        const arrival_result = await room_service.getRoom(arrival);
+
+        if(depart_result !== null && arrival_result !== null){
+            dataToROS['depart'] = {"x" : depart_result[0].x, "y" : depart_result[0].y};
+            dataToROS['stuff'] = stuff;
+            dataToROS['arrival'] = {"x": arrival_result[0].x, "y" : depart_result[0].y};
+
+            socket.to(roomName).emit('stuffBringToROS', dataToROS);
+        }
     })
 
     socket.on('env_msg_request_web', () => {

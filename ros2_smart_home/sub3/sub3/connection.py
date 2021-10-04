@@ -42,9 +42,6 @@ class connection(Node):
         self.timer = self.create_timer(0.05, self.status_pub_timer)
         self.operation={}
 
-        # 심부름 로직 처리하기 위함
-        self.turtlebot_status_pub = self.create_publisher(TurtlebotStatus,'turtlebot_status', 10)
-
         # 터틀 봇이 일중인지 판단
         self.is_working = False
 
@@ -70,7 +67,7 @@ class connection(Node):
         # 0b 0000 0000 0000 0111 : can_find_object
         # 0b 0000 0000 0000 1111 : doing_find_object
         # 0b 0000 0000 0001 1111 : can_go_object
-        # 0b 0000 0000 0011 1111 : doing_find_object
+        # 0b 0000 0000 0011 1111 : doing_go_object
         # 0b 0000 0000 0111 1111 : can_go_arrival
         # 0b 0000 0000 1111 1111 : doing_go_arrival
 
