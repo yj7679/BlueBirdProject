@@ -5,9 +5,11 @@
         </div>
         <div class="card rounded-3 card_size">
             <div class="card-body">
-                <h5 class="mp_full card-title">{{this.employee.name}}</h5>
+                <h5 class="mp_full card-title">{{this.employee.name}}님</h5>
                 <ul class="mb-5 list-group list-group-flush">
-                    <li class="list-group-item">사원번호 : {{this.employee.id}}</li>
+                    <li class="list-group-item">사원번호 : {{this.employee.number}}</li>
+                    <li class="list-group-item">회사명 : {{this.employee.company}}</li>
+                    <li class="list-group-item">부서 : {{this.employee.department}}</li>
                     <li class="list-group-item">직급 : {{this.employee.job}}</li>
                     <li class="list-group-item"></li>
                 </ul>
@@ -21,16 +23,22 @@ export default {
     data() {
         return {
             employee:{
-                id:"",
+                number:"",
                 name:"",
+                company:"",
+                department:"",
                 job:"",
             }
         }
     },
     created() {
-        this.$socket.on('employee',(data)=>{
-            this.employee.id = data.id;
+        var employee_number = JSON.parse(localStorage.getItem('employee_number'));
+
+        this.$socket.emit('employee',employee_number,(data)=>{
+            this.employee.id = data.employee_number;
             this.employee.name = data.name;
+            this.employee.company = data.company;
+            this.employee.department = data.department;
             this.employee.job = data.job;
         })
     },
