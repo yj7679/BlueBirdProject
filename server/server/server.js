@@ -100,14 +100,14 @@ io.on('connection', socket => {
         })
     })
 
-    socket.on('env_msg_request', () => {
+    socket.on('env_msg_request_web', () => {
         console.log('server get env msg req');
-        socket.to(roomName).emit('env_msg_request');
+        socket.to(roomName).emit('env_msg_request_ros');
     }); 
     
-    socket.on('env_msg_response', (msg)=>{
+    socket.on('env_msg_response_ros', (msg)=>{
         console.log('ros response : ', msg);
-        socket.to(roomName).emit('env_msg_response', msg);
+        socket.to(roomName).emit('env_msg_response_web', msg);
     })
 
     socket.on('bot_status_response', (msg)=>{

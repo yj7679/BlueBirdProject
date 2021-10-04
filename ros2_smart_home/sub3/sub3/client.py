@@ -55,7 +55,7 @@ class client(Node):
             self.working_status_msg.data = 0b111
             self.working_status_pub.publish(self.working_status_msg)
         
-        @self.sio.on('env_msg_request')
+        @self.sio.on('env_msg_request_ros')
         def envRequest():
             print('server emit env_msg_request!')
             env_msg_response = dict()
@@ -63,7 +63,7 @@ class client(Node):
             env_msg_response['temperature'] = conn.env_data.temperature
             
             print('env response : ',env_msg_response)
-            self.sio.emit('env_msg_response', env_msg_response)
+            self.sio.emit('env_msg_response_ros', env_msg_response)
 
         @self.sio.event
         def disconnect():

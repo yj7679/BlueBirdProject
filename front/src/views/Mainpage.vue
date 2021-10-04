@@ -60,6 +60,10 @@ export default {
         this.date = date
         this.time = time
         this.day = day[today.getDay()]
+        // this.$socket.emit('env_msg_request_web', 'go')
+        // this.$socket.on('env_msg_response_web', (data) => {
+        //     console.log(data);
+        // })
     },
     mounted() {
         setInterval(() => {
@@ -78,6 +82,11 @@ export default {
             this.date = date
             this.time = time
             this.day = day[today.getDay()]
+
+            this.$socket.emit('env_msg_request_web', 'go')
+            this.$socket.on('env_msg_response_web', (data) => {
+                console.log(data);
+            })
         }, 1000);
     }
 }
