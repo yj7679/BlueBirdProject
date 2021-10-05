@@ -54,7 +54,7 @@ export default {
             value:{
                 room_name:"",
                 device_name :"",
-
+                on_off: ""
             },
             selectvalue:"",
             showtext:false,
@@ -100,10 +100,12 @@ export default {
         },
         on(){
             //상태를 받고 on 전달
-            this.$socket.emit('deviceOn',this.value);
+            this.value['on_off'] = 'on'
+            this.$socket.emit('deviceControl',this.value);
         },
         off(){
-            this.$socket.emit('deviceOff',this.value);
+            this.value['on_off'] = 'off'
+            this.$socket.emit('deviceControl',this.value);
         },
     },
     watch:{

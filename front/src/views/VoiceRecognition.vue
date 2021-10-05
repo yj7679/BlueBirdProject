@@ -42,7 +42,8 @@ export default {
             },
             sendDeviceData: {
                 'device_name': null,
-                'room_name': '사무'
+                'room_name': '사무',
+                'on_off': null
             }
         }
     },
@@ -117,16 +118,19 @@ export default {
             // 어떤 명령인지 파악하기
             // Device On
             if (this.voiceInput.indexOf('켜') != -1) {
-                this.$socket.emit('deviceOn', (this.sendDeviceData))
+                this.sendDeviceData['on_off'] = 'on'
+                this.$socket.emit('deviceControl', (this.sendDeviceData))
             }
             else if (this.voiceInput.indexOf('꺼') != -1) {
-                this.$socket.emit('deviceOff', (this.sendDeviceData))
+                this.sendDeviceData['on_off'] = 'off'
+                this.$socket.emit('deviceControl', (this.sendDeviceData))
             }
             else {
                 alert('잘못된 명령입니다')
             }
             this.sendDeviceData['device_name'] = null
             this.sendDeviceData['room_name'] = '사무'
+            this.sendDeviceData['on_off'] = null
         },
         errand() {
             const slicing = this.voiceInput.split('에')
