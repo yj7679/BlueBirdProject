@@ -61,25 +61,33 @@ io.on('connection', socket => {
 
     // Vue -> Server
 
-    // 기기 제어 On
-    // data: {"room_name": , "device_name": }
-    socket.on('deviceOn', (data) => {
+    // 가전기기 제어 (on/off)
+    // data: {"room_name": , "device_name": , "on_off":}
+    socket.on('deviceControl', async (data) => {
         const dataToROS = {};
+        let device_result;
+        //잘못된 데이터 입력시
+        if(data.device_name === undefined || data.room_name === undefined || data.on_off === undefined || (data.on_off !== 'on' && data.on_off !== 'off' )){
+            data = null;
+        }
 
-        device_service.onDevice(data).then((result)=>{
-            // console.log(result[0].x);
-            // dataToROS = {};
-            // dataToROS['arrival'] = { "x": result[0].x, "y": result[0].y };
+        if(data !== null){
+            try{
+                device_result = await device_service.searchDevice(data);
+            }catch(err){
+                console.log(err);
+            }
             
-            // console.log(dataToROS);
-        })
+            if(device_result !== null){
+                dataToROS['arrival'] = {
+                    'x' : device_result[0].x,
+                    'y' : device_result[0].y,
+                    'on_off' : data.on_off
+                }
 
-    })
-
-    // 기기 제어 Off
-    // data: {"room_name": , "device_name": }
-    socket.on('deviceOff', (data) => {
-        console.log(data, 'off');
+                socket.to(roomName).emit('deviceControlToROS', dataToROS);
+            }
+        }
     })
 
     // 심부름

@@ -18,7 +18,7 @@ module.exports = {
             });
         });
     },
-    onDevice : function(data){
+    searchDevice : function(data){
         const query = mybatisMapper.getStatement('device', 'searchDevice', data);
         return new Promise((resolve, reject)=>{
             db.query(query, (err, result, fields)=>{
