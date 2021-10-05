@@ -49,7 +49,6 @@ export default {
         }
     },
     created() {
-        localStorage.setItem('employee_number',1);
         this.data["employee_number"] = localStorage.getItem('employee_number');
 
         this.$socket.emit('employee',this.data)
@@ -64,10 +63,6 @@ export default {
     },
     methods: {
         logout(){
-            //clear해도 되나,,?
-            //localStorage.clear();
-
-            //remove
             localStorage.removeItem('employee_number');
             this.$router.push('/login');
         }

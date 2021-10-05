@@ -3,7 +3,7 @@
         <Header />
         <div class="mp_full container">
             <div class="mp_full container">
-                <h5 class="main_text">000님 안녕하세요</h5>
+                <h5 class="main_text">{{ name }}님 안녕하세요</h5>
             </div>
             <div class="card main_card rounded-3" style="margin-bottom:8px;">
                 <!--미니맵-->
@@ -55,7 +55,8 @@ export default {
             time: null,
             day: null,
             weather: null,
-            temperature: null
+            temperature: null,
+            name: null
         }
     },
     created() {
@@ -78,6 +79,13 @@ export default {
         this.$socket.on('env_msg_response_web', (data) => {
             this.weather = data.weather
             this.temperature = data.temperature
+        })
+
+        const data = {'employee_number': null}
+        data["employee_number"] = localStorage.getItem('employee_number')
+        this.$socket.emit('employee', data)
+        this.$socket.on('putEmployee',(data) => {
+            this.name = data[0].name
         })
     },
     mounted() {
