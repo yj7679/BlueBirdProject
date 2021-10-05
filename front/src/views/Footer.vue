@@ -2,19 +2,19 @@
     <div class="ft_set container">
         <div class="row">
             <div class="col" @click="goMain">
-                <img class="ft_img" src="../assets/img/whitehome.png" alt="no home">
+                <img class="ft_img" src="../assets/img/whitehome_shadow.png" alt="no home">
             </div>
             <div class="col" @click="goDelivery">
-                <img class="ft_img" src="../assets/img/deliver_white.png" width="20%" alt="no home">
+                <img class="ft_img" src="../assets/img/box_white_shadow.png" width="20%" alt="no home">
             </div>
             <div class="col" @click="goVoice">
-                <img class="ft_img" src="../assets/img/mic_white.png" width="20%" alt="no home">
+                <img class="ft_img" src="../assets/img/mic_white_shadow.png" width="20%" alt="no home">
             </div>
             <div class="col" @click="goControl">
-                <img class="ft_img" src="../assets/img/turn-off_white.png" width="20%" alt="no home">
+                <img class="ft_img" src="../assets/img/settings_white.png" width="20%" alt="no home">
             </div>
             <div class="col" @click="goMypage">
-                <img class="ft_img" src="../assets/img/user_white.png" width="20%" alt="no home">
+                <img class="ft_img" src="../assets/img/user_white_shadow.png" width="20%" alt="no home">
             </div>
         </div>
     </div>

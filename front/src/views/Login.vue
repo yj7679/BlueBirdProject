@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="container pt-5">
-            <img src="../assets/img/peace.png" 
+            <img src="../assets/img/logo_white.png" 
             class="main_img mx-auto d-block m-5" alt="Cinque Terre">
         </div>
         <div class="container">
