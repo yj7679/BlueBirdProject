@@ -39,6 +39,10 @@ export default {
         }
     },
     created() {
+        const isLogin = localStorage.getItem('employee_number') || ''
+        if (isLogin == '') {
+            this.$router.push('/login')
+        }
         var check = localStorage.getItem('update');
         console.log(check)
         if(check == 'true'){

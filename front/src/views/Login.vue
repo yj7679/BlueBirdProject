@@ -48,6 +48,12 @@ export default {
             this.$socket.emit('join',this.employee);
         }
     },
+    created() {
+        const isLogin = localStorage.getItem('employee_number') || ''
+        if (isLogin != '') {
+            this.$router.push('/main')
+        }
+    },
     mounted() {
         this.$socket.on('login', (data) => {
             if (data[0]) {
