@@ -24,5 +24,4 @@
         FROM employee e
         WHERE e.employee_number = #{employee_number}
     </select>
-
 </mapper>
