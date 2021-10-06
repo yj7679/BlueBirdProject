@@ -5,7 +5,7 @@
             <!--세로 중앙정렬이 안돼서 빈 container생성, 근데 px로 크기 지정해놔서 고치고 싶다..-->
             <div class="container" style="height:150px;"></div>
             <div class="d-flex align-items-center">
-            <img @click="voiceRecognition" src="../assets/img/voice.png" style="margin:auto; width:170px;">
+            <img @click="voiceRec" src="../assets/img/voice.png" style="margin:auto; width:170px;">
             </div>
             <div class="vc_text container">
                 <h5 v-if="btnCheck">{{ voiceInput }}</h5>
@@ -44,11 +44,12 @@ export default {
                 'device_name': null,
                 'room_name': '사무',
                 'on_off': null
-            }
+            },
+            commandCheck: false
         }
     },
     methods: {
-        voiceRecognition() {
+        voiceRec() {
             this.btnCheck = false
             var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -119,6 +120,7 @@ export default {
             // Device On
             if (this.voiceInput.indexOf('켜') != -1) {
                 this.sendDeviceData['on_off'] = 'on'
+                console.log(this.sendDeviceData);
                 this.$socket.emit('deviceControl', (this.sendDeviceData))
             }
             else if (this.voiceInput.indexOf('꺼') != -1) {
@@ -209,14 +211,29 @@ export default {
     },
     watch: {
         voiceInput() {
+            if (this.voiceInput.length == 0) {
+                return
+            }
             for(const device of this.deviceList) {
                 const deviceCheck = this.voiceInput.indexOf(device)
                 if (deviceCheck != -1) {
                     this.deviceControl(device)
+                    this.commandCheck = true
                     return
                 }
             }
-            this.errand(this.voiceInput)
+            for (const stuff of this.stuffList) {
+                const stuffCheck = this.voiceInput.indexOf(stuff)
+                if (stuffCheck != -1) {
+                    this.errand()
+                    this.commandCheck = true
+                    return
+                }
+            }
+            if (!this.commandCheck) {
+                alert('잘못된 명령입니다')
+            }
+            this.commandCheck = false
         }
     }
 }

@@ -24,7 +24,7 @@
 export default {
     methods: {
         goMain(){
-            this.$router.push('/main');
+            this.$router.push('/');
         },
         goDelivery(){
             this.$router.push('/delivery');
