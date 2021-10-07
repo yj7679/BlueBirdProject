@@ -4,5 +4,3 @@ float32 battery_percentage
 bool can_use_hand 
 bool can_put
 bool can_lift
-
-

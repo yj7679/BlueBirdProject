@@ -398,3 +398,7 @@ item {
   id: 90
   display_name: "toothbrush"
 }
+item {
+  id: 91
+  name: 'box'
+}

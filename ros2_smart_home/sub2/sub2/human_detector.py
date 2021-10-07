@@ -143,8 +143,8 @@ class HumanDetector(Node):
     
                 xl.append(int(x))
                 yl.append(int(y))
-                wl.append(int(x+w))
-                hl.append(int(y+h))
+                wl.append(int(w))
+                hl.append(int(h))
 
             if self.able_to_pub:
 

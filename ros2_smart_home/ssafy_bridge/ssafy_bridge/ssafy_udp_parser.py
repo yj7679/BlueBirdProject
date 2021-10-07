@@ -148,6 +148,8 @@ class erp_udp_parser :
                 msg.can_use_hand=hand_status[0]
                 msg.can_put=hand_status[1]
                 msg.can_lift=hand_status[2]
+                
+                
                 self.publisher.publish(msg)
 
 

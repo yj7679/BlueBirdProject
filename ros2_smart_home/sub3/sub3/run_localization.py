@@ -37,7 +37,7 @@ params_map = {
     "MAP_RESOLUTION": 0.05,
     "OCCUPANCY_UP": 0.02,
     "OCCUPANCY_DOWN": 0.01,
-    "MAP_CENTER": (-8.0, -4.0),
+    "MAP_CENTER": (-6, 10),
     "MAP_SIZE": (17.5, 17.5),
     "MAPVIS_RESIZE_SCALE": 2.0
 }
@@ -66,33 +66,35 @@ def compute_relative_pose(pose_i, pose_j):
         
     """
     로직 1 : 두 pose를 기준으로 하는 좌표변환 행렬 정의
-    T_i = xyh2mat2D(pose_i)
-    T_j = xyh2mat2D(pose_j)
-
     """
+    T_i = utils.xyh2mat2D(pose_i)
+    T_j = utils.xyh2mat2D(pose_j)
+
     
     """
     로직 2 : Rot 행렬, trans 백터 추출
-    R_i = 
-    t_i = 
-
     """
+    R_i = np.transpose(T_i[:2, :2])
+    t_i = -R_i.dot(T_i[:2, 2])
+
+    
 
     """
     로직 3 : pose i 기준 pose j에 대한 Rot 행렬, trans 백터 계산
-    R_ij = 
-    t_ij = 
-    
     """
+    R_ij = np.matmul(R_i, T_j[:2, :2])
+    t_ij = R_i.dot(T_j[:2, 2]) + t_i
+    
+    
 
     """
     로직 4 : 위의 Rot 행렬, trans 백터로 pose_ij를 계산
-    
-    pose_ij = np.array([0.0, 0.0, 0.0])    
-    pose_ij[:2] = 
-    pose_ij[2] = 
-
     """
+    pose_ij = np.array([0.0, 0.0, 0.0])
+    pose_ij[:2] = t_ij[:]
+    pose_ij[2] = np.arctan2(R_ij[1,0], R_ij[0,0])*180.0/np.pi
+
+    
 
     """
     테스트
@@ -135,7 +137,7 @@ class Localization:
         self.map_resolution = params_map["MAP_RESOLUTION"]
         self.map_size = np.array(params_map["MAP_SIZE"]) / self.map_resolution
         self.map_center = params_map["MAP_CENTER"]
-        self.map = np.ones((self.map_size[0].astype(np.int), self.map_size[1].astype(np.int)))*0.5
+        self.map = np.ones((self.map_size[0].astype(int), self.map_size[1].astype(int)))*0.5
         self.occu_up = params_map["OCCUPANCY_UP"]
         self.occu_down = params_map["OCCUPANCY_DOWN"]
 
@@ -165,10 +167,10 @@ class Localization:
     def load_map(self):
 
         # 로직 4. 저장된 맵을 불러옵니다.
-        pkg_path =os.getcwd()
+        pkg_path ='C:\\Users\\multicampus\\Desktop\\IoTPJT\\ros2_smart_home\\sub3\\map'
         back_folder='..'
         folder_name='map'
-        file_name='map.txt'
+        file_name='map3.txt'
         full_path=os.path.join(pkg_path,back_folder,folder_name,file_name)
         f=open(full_path,'r')
 
@@ -253,10 +255,10 @@ class Localization:
             pos_y = (rand_y - self.map_center[1] + (cols * self.map_resolution)/2)/self.map_resolution
             # print(pos_x)
             # TODO : check rows and cols
-            if pos_y.astype(np.int) > 0 and pos_x.astype(np.int) > 0 and pos_y.astype(np.int) < rows and pos_x.astype(np.int) < cols:
-                map_bgr_with_particle.itemset(pos_y.astype(np.int), pos_x.astype(np.int),0, 0)
-                map_bgr_with_particle.itemset(pos_y.astype(np.int), pos_x.astype(np.int),1, 255)
-                map_bgr_with_particle.itemset(pos_y.astype(np.int), pos_x.astype(np.int),2, 0)
+            if pos_y.astype(int) > 0 and pos_x.astype(int) > 0 and pos_y.astype(int) < rows and pos_x.astype(int) < cols:
+                map_bgr_with_particle.itemset(pos_y.astype(int), pos_x.astype(int),0, 0)
+                map_bgr_with_particle.itemset(pos_y.astype(int), pos_x.astype(int),1, 255)
+                map_bgr_with_particle.itemset(pos_y.astype(int), pos_x.astype(int),2, 0)
             # print(rand_x)
 
         pose = self.max_prob_particle[:3]
@@ -281,7 +283,7 @@ class Localization:
                         self.map_size[1] * self.map_resolution) / 2) / self.map_resolution
 
             for i in range(laser_global.shape[1]):
-                (l_x, l_y) = np.array([laser_global_x[i], laser_global_y[i]]).astype(np.int)
+                (l_x, l_y) = np.array([laser_global_x[i], laser_global_y[i]]).astype(int)
                 center = (l_x, l_y)
                 cv2.circle(map_bgr_with_particle, center, 1, (255, 0, 0), -1)
 
@@ -297,7 +299,7 @@ class Localization:
         cv2.waitKey(1)
 
     def _prediction(self, diff_pose):
-        """
+        
 
         # 로직 10. prediction
         # 파티클 필터의 예측단계를 수행하는 파트이며,
@@ -309,30 +311,30 @@ class Localization:
         # delta_angle1 = 1.1071
         # delta_angle1 = -0.7581
 
-        delta_dist = 
-
-        delta_angle1 = 
-        delta_angle2 = 
+        delta_dist = sqrt(diff_pose[0]**2 + diff_pose[1]**2)
         
-        odom_cov = 
+        delta_angle1 = np.arctan2(diff_pose[1],diff_pose[0])
+        delta_angle2 = np.deg2rad(diff_pose[2]) - delta_angle1
+        
+        odom_cov = [self.odom_translation_cov,self.odom_translation_cov, self.odom_heading_cov]
 
         delta_angle1 = utils.limit_angular_range(delta_angle1)
 
-        dist_noise_coeff = 
-        angle1_noise_coeff = 
-        angle2_noise_coeff = 
+        dist_noise_coeff = odom_cov[0] * np.fabs(delta_dist) + odom_cov[2]*np.fabs(delta_angle1+delta_angle2)
+        angle1_noise_coeff = odom_cov[0] * np.fabs(delta_dist) + odom_cov[2]*np.fabs(delta_angle1)
+        angle2_noise_coeff = odom_cov[0] * np.fabs(delta_dist) + odom_cov[2]*np.fabs(delta_angle2)
 
         score_sum = 0
 
         for i in range(self.num_particle):
 
-            delta_dist = 
-            delta_angle1 = 
-            delta_angle2 = 
+            delta_dist = delta_dist + np.random.normal(0,1)*dist_noise_coeff
+            delta_angle1 = delta_angle1 + np.random.normal(0,1)*angle1_noise_coeff
+            delta_angle2 = delta_angle2 + np.random.normal(0,1)*angle2_noise_coeff
 
-            x = 
-            y = 
-            h = 
+            x = cos(delta_angle1) * delta_dist + np.random.normal(0,1)*odom_cov[0]
+            y = sin(delta_angle1) * delta_dist+ np.random.normal(0,1)*odom_cov[1]
+            h = delta_angle1+ delta_angle2+np.random.normal(0,1)*odom_cov[2]
 
             diff_odom_noise = np.array([x, y, h*180.0/np.pi])
             diff_odom_T = utils.xyh2mat2D(diff_odom_noise)
@@ -344,7 +346,7 @@ class Localization:
             score_sum += self.particles[3, i]
             self.particles[:3, i] = utils.mat2D2xyh(T_j)
 
-        """
+        
 
         self.particles[3, :] = self.particles[3, :] #/ score_sum위 코드를 완성한 후 주석을 해제해 주세요
 
@@ -390,7 +392,7 @@ class Localization:
                 continue
 
             # 파티클이 occupied region (벽) 에 걸친 경우
-            occupancy = self.map[particle_pose_y.astype(np.int), particle_pose_x.astype(np.int)]
+            occupancy = self.map[particle_pose_y.astype(int), particle_pose_x.astype(int)]
             if occupancy < 0.75:
                 self.particles[3, i] = 0
                 continue
@@ -403,19 +405,20 @@ class Localization:
             로직 11. weighting
             # 맵안에 존재하는 유효한 파티클들의 픽셀좌표만 남기고 그 픽셀 좌표 상에서의
             # map의 값만 골라오십시오
-            valid_idx = 
-            valid_x = 
-            valid_y =  
-            vals = self.map[valid_y.astype(np.int), valid_x.astype(np.int)]
+            """
+            valid_idx = (0<=points_global_x)&(points_global_x<=cols)&(0<= points_global_y)&(points_global_y<=rows)
+            valid_x = points_global_x[valid_idx]
+            valid_y =  points_global_y[valid_idx]
+            vals = self.map[valid_y.astype(int), valid_x.astype(int)]
             
             # 0.25라는 값을 기준으로 이상이면 wall, 이하면 empty로 정의하십시오
-            walls = 
-            empty = 
+            walls = vals[vals < 0.25]
+            empty = vals[vals >= 0.25]
 
             # 라이다의 측정값인 laser scan의 위치가 실제 벽에 매칭이 많이 될수록
             # 그 파티클은 실제 위치에 가까운 것입니다.
             # walls==True인 개수를 weight로 정의하십시오.
-            weight = 
+            weight = walls.shape[0]
             penalty = np.sum(empty)*0.0
             weight = weight - penalty
             weights[i] = weight
@@ -423,7 +426,7 @@ class Localization:
             self.particles[3, i] += weight / transformed_points.shape[1]
             score_sum += self.particles[3, i]
 
-            """
+           
 
             if max_score < self.particles[3, i]:
                 self.max_prob_particle = self.particles[:,i]
@@ -458,14 +461,16 @@ class Localization:
         """
         로직 12. resampling
         np.random.uniform로 파티클 개수만큼 난수를 뽑은 다음, 그 난수에 
-        
+        """
         for i in range(n_particles):
-            darted_score = 
-            darted_idx = 
-            
+            darted_score = np.random.uniform(0,score_basline,1)
+            for j in range(n_particles) :
+                if(darted_score <= particle_scores[j]):
+                    darted_idx = j
+                    break
             selected_particles[:, i] = self.particles[:, darted_idx]
 
-        """
+        
 
         self.particles = selected_particles.copy()
 
@@ -485,15 +490,12 @@ class Localization:
             return
 
 
-        """diff_pose =""" 
+        
+        diff_pose = compute_relative_pose(self.odom_before,pose)
         diff_pose = np.array([[0],[0],[0]])
 
-        """
-        diff_dist = 
-        diff_angle = 
-        """
-        diff_dist = 0.1
-        diff_angle = 0
+        diff_dist = sqrt(np.square(diff_pose[:2]).sum())
+        diff_angle = diff_pose[2]
 
 
         if diff_dist > 1 :
@@ -628,11 +630,11 @@ class Localizer(Node):
                 turtlebot_status의 정보들로 선속도를 얻고
                 imu callback에서 처리한 odom_theta로 로봇의 헤딩을 얻어서
                 odom_theta, odom_x, odom_y 업데이트
-
-                linear_x =     
-                self.odom_x+=
-                self.odom_y+=
                 """
+                linear_x = msg.twist.linear.x    
+                self.odom_x+= linear_x * cos(self.odom_theta)*self.period
+                self.odom_y+= linear_x * sin(self.odom_theta)*self.period
+                
                 self.prev_time=self.current_time
 
 
@@ -670,30 +672,29 @@ class Localizer(Node):
 
 
             # 라이다를 global 좌표로 변환해서 sending
-            """            
+                      
             # 로직 14. 위치 추정 결과를 publish
             self.laser_transform.header.stamp =rclpy.clock.Clock().now().to_msg()
             self.broadcaster.sendTransform(self.laser_transform)
 
-            amcl_q = Quaternion.from_euler(....)
-            self.localizer_transform.header.stamp =
-            self.localizer_transform.transform.translation.x = 
-            self.localizer_transform.transform.translation.y = 
-            self.localizer_transform.transform.rotation.x = 
-            self.localizer_transform.transform.rotation.y = 
-            self.localizer_transform.transform.rotation.z = 
-            self.localizer_transform.transform.rotation.w = 
+            amcl_q = Quaternion.from_euler(0,0,self.odom_theta -self.imu_offset[2])
+            self.localizer_transform.header.stamp = rclpy.clock.Clock().now().to_msg()
+            self.localizer_transform.transform.translation.x = (float)(amcl_pose[0])
+            self.localizer_transform.transform.translation.y =  (float)(amcl_pose[1])
+            self.localizer_transform.transform.rotation.x = amcl_q.x
+            self.localizer_transform.transform.rotation.y = amcl_q.y
+            self.localizer_transform.transform.rotation.z = amcl_q.z
+            self.localizer_transform.transform.rotation.w = amcl_q.w
             
             self.broadcaster.sendTransform(self.localizer_transform)
 
-            self.odom_msg.pose.pose.position.x = 
-            self.odom_msg.pose.pose.position.y =
-            self.odom_msg.pose.pose.orientation.x =
-            self.odom_msg.pose.pose.orientation.y =
-            self.odom_msg.pose.pose.orientation.z =
-            self.odom_msg.pose.pose.orientation.w =
-            """
-
+            self.odom_msg.pose.pose.position.x = (float)(amcl_pose[0])
+            self.odom_msg.pose.pose.position.y = (float)(amcl_pose[1])
+            self.odom_msg.pose.pose.orientation.x = amcl_q.x
+            self.odom_msg.pose.pose.orientation.y = amcl_q.y
+            self.odom_msg.pose.pose.orientation.z = amcl_q.z
+            self.odom_msg.pose.pose.orientation.w = amcl_q.w
+            
             self.odom_publisher.publish(self.odom_msg)        
             self.prev_amcl_pose=amcl_pose
         

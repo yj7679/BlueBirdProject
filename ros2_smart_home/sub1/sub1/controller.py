@@ -137,14 +137,14 @@ class Controller(Node):
 
         
         ## IOT(가전) 제어 함수
-        # self.app_all_on()
-        self.app_all_off()
+        self.app_all_on()
+        # self.app_all_off()
         # self.app_select_on(12)
         # self.app_select_off(12)
 
 
         ## 터틀봇 제어 함수
-        self.turtlebot_go()
+        # self.turtlebot_go()
         # self.turtlebot_stop()
         # self.turtlebot_cw_rot()
         # self.turtlebot_cww_rot()

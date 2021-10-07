@@ -28,13 +28,14 @@ class IMGParser(Node):
         ## 미리 정의된 토픽 이름인 '/image_jpeg/compressed' 에서
         ## CompressedImage 메시지를 받도록 설정된다.
 
-        print("hello1")
         self.subscription = self.create_subscription(
             CompressedImage,
             '/image_jpeg/compressed',
             self.img_callback,
             10)
         print(self.subscription)
+        self.a = 0
+        self.cnt=0
 
     def img_callback(self, msg):
 
@@ -67,7 +68,8 @@ class IMGParser(Node):
         
         # h, w, _ = img_gray.shape : 세로, 가로, 채널 수 사이즈를 얻는 것
 
-        img_resize =  cv2.resize(img_gray, None, fx=0.5,fy=0.5, interpolation= cv2.INTER_AREA)
+        # img_resize =  cv2.resize(img_gray, None, fx=1.0,fy=1.0, interpolation= cv2.INTER_AREA)
+        img_resize =  cv2.resize(img_bgr, None, fx=2.0,fy=2.0, interpolation= cv2.INTER_AREA)
         
 
         # 로직 5. 이미지 출력 (cv2.imshow)       
@@ -75,7 +77,16 @@ class IMGParser(Node):
         # cv2.imshow("img_gray", img_gray)
         cv2.imshow("resize and gray", img_resize)       
         
+        # 학습 데이터 생성
+        self.a += 1
+        if self.a%30 == 0:
+            self.cnt += 1
+            img_name = "document_{}.png".format(self.cnt)
+            cv2.imwrite(img_name, img_resize)
+            print('save image !')
+        
         cv2.waitKey(1)
+        
 
 
 def main(args=None):

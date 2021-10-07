@@ -33,7 +33,7 @@ params_map = {
     "MAP_RESOLUTION": 0.05,
     "OCCUPANCY_UP": 0.02,
     "OCCUPANCY_DOWN": 0.01,
-    "MAP_CENTER": (-8.0, -4.0),
+    "MAP_CENTER": (-6.0, 10.0),
     "MAP_SIZE": (17.5, 17.5),
     "MAP_FILENAME": 'test.png',
     "MAPVIS_RESIZE_SCALE": 2.0
@@ -363,7 +363,7 @@ class Mapper(Node):
 def save_map(node,file_path):
 
     # 로직 12 : 맵 저장
-    pkg_path =os.getcwd()
+    pkg_path ='C:\\Users\\multicampus\\Desktop\\IoTPJT\\ros2_smart_home\\sub3\\sub3'
     back_folder='..'
     folder_name='map'
     file_name=file_path
@@ -381,14 +381,15 @@ def save_map(node,file_path):
 def main(args=None):    
     rclpy.init(args=args)
     
-    #try :    
-    run_mapping = Mapper()
-    rclpy.spin(run_mapping)
-    run_mapping.destroy_node()
-    rclpy.shutdown()
+    try :    
+        run_mapping = Mapper()
+        rclpy.spin(run_mapping)
+        run_mapping.destroy_node()
+        rclpy.shutdown()
 
-    #except :
-    #    save_map(run_mapping,'map.txt')
+    except :
+        save_map(run_mapping,'map3.txt')
+        
 
 
 if __name__ == '__main__':

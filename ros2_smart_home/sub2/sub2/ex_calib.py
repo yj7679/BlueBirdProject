@@ -268,6 +268,10 @@ class LIDAR2CAMTransform:
         self.proj_mtx = project2img_mtx(params_cam)
 
     def transform_lidar2cam(self, xyz_p):
+
+        xyz_plus = np.ones((xyz_p.shape[0], 1)) # 차원을 맞춰주기 위한 xyz_p 행 1열의 1 array 생성
+           
+        xyz_p = np.concatenate((xyz_p, xyz_plus), axis=1) # 3열의 xyz_p를 4열의 xyz_p로 augmentation
         
         xyz_c = xyz_p
         
@@ -391,9 +395,7 @@ class SensorCalib(Node):
             로직 5. 라이다 x,y 좌표 데이터 중 정면 부분만 crop
             """
             xyz_p = np.concatenate((self.xyz[0:90],self.xyz[270:360]), axis=0) # 270 ~ 89도까지의 라이다 포인트 슬라이싱
-            xyz_plus = np.ones((xyz_p.shape[0], 1)) # 차원을 맞춰주기 위한 xyz_p 행 1열의 1 array 생성
-           
-            xyz_p = np.concatenate((xyz_p, xyz_plus), axis=1) # 3열의 xyz_p를 4열의 xyz_p로 augmentation
+            
             # print(xyz_p)
 
             """
