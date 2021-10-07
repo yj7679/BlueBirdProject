@@ -29,6 +29,9 @@ const port = process.env.port || 12001
 
 server.listen(port, () => {
     console.log(`listening on *:${port}`);
+    require('dns').lookup(require('os').hostname(), function (err, add, fam) {
+        console.log('addr: ' + add);
+    })
 });
 
 const roomName = 'team';
@@ -84,8 +87,10 @@ io.on('connection', socket => {
                     'y' : device_result[0].y,
                     'on_off' : data.on_off
                 }
-
-                socket.to(roomName).emit('deviceControlToROS', dataToROS);
+                
+                console.log('dataToROS : ', dataToROS);
+                // socket.to(roomName).emit('deviceControlToROS', dataToROS);
+                io.emit('deviceControlToROS', dataToROS);
             }
         }
     })
@@ -122,7 +127,7 @@ io.on('connection', socket => {
         if(depart_result !== null && arrival_result !== null){
             dataToROS['depart'] = {"x" : depart_result[0].x, "y" : depart_result[0].y};
             dataToROS['stuff'] = stuff;
-            dataToROS['arrival'] = {"x": arrival_result[0].x, "y" : depart_result[0].y};
+            dataToROS['arrival'] = {"x": arrival_result[0].x, "y" : arrival_result[0].y};
 
             socket.to(roomName).emit('stuffBringToROS', dataToROS);
         }
@@ -153,6 +158,11 @@ io.on('connection', socket => {
     socket.on('disconnect', () => {
         console.log('disconnected from server');
     });
+
+    socket.on('jobDone', (msg)=>{
+        console.log('작업하나 완료');
+        io.emit('stuffBrinfCheck', msg);
+    })
 
     // 전달받은 이미지를 jpg 파일로 저장
     socket.on('streaming', (message) => {

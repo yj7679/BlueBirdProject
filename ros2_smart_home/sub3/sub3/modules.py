@@ -15,3 +15,14 @@ def getCurrStage(stageNum):
         idx+=1
         stageNum-=1
     return ret
+
+def checkUDPstage(stage):
+    ret = 0
+    while stage%2==0 :
+        ret+=1
+        stage = (stage>>1) | (1<<15)
+    return ret
+
+def getUDPstage(num):
+    ret = ~getCurrStage(num)
+    return ret

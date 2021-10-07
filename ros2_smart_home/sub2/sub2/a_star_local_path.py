@@ -40,7 +40,7 @@ class astarLocalpath(Node):
         # 전역경로에 몇 개의 경로점들을 넣을지 local_path_size에 설정을 해둔다.
         time_period=0.05 
         self.timer = self.create_timer(time_period, self.timer_callback)
-        self.local_path_size=30 
+        self.local_path_size=30
         self.count=0
         self.current_waypoint = -1
 
@@ -101,7 +101,7 @@ class astarLocalpath(Node):
                 
 
                 else :
-                    for num in range(current_waypoint,len(self.global_path_msg.poses) ) :
+                    for num in range(current_waypoint,len(self.global_path_msg.poses)-6 ) :
                         tmp_pose = PoseStamped()
                         tmp_pose.pose.position.x = self.global_path_msg.poses[num].pose.position.x
                         tmp_pose.pose.position.y = self.global_path_msg.poses[num].pose.position.y

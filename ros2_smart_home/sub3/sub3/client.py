@@ -1,36 +1,36 @@
 import socketio
 import threading
 import rclpy
+import time
 from rclpy.node import Node
 from connection import *
+from modules import *
 from geometry_msgs.msg import Twist
 from ssafy_msgs.msg import EnviromentStatus
 from std_msgs.msg import Int16, Int8
 
-stuff_status = {
-    1 : "박스",
-    2 : "물",
-    3 : "서류철"
-}
-
-# 심부름 상태에 대해 컨트롤할 것
+# 심부름 상태에 대해 컨트롤할 것 #
 work_status = {
-    0b00000000 : "사용가능",
-    0b00000001 : "목적지로 이동 중",
-    0b00000011 : "목적지로 이동 중",
-    0b00000111 : "물건 찾는 중",
-    0b00001111 : "물건 찾는 중",
-    0b00011111 : "물건에게 다가가는 중",
-    0b00111111 : "물건에게 다가가는 중",
-    0b01111111 : "복귀 하는 중"
-    
+    0 : "사용 가능",
+    getCurrStage(1) : "물건을 가지러 가는 중입니다",
+    getCurrStage(2) : "물건을 가지러 가는 중입니다",
+    getCurrStage(3) : "물건을 찾는 중입니다",
+    getCurrStage(4) : "물건으로 이동 중입니다",
+    getCurrStage(5) : "물건을 들고 이동 중입니다",
+    getCurrStage(6) : "물건을 들고 이동 중입니다",
+    getCurrStage(7) : "물건을 들고 이동 중입니다",
+    getCurrStage(8) : "물건을 들고 이동 중입니다",
+    getCurrStage(9) : "물건을 들고 이동 중입니다",
+    getUDPstage(1) : "가전기기로의 경로를 생성 중 입니다",
+    getUDPstage(2) : "가전기기로 이동 중 입니다.",
+    getUDPstage(3) : "가전기기를 제어 중 입니다.",
+    getUDPstage(4) : "가전기기 제어를 종료 중입니다",
 }
-
+ 
 def startConn(conn):
     rclpy.spin(conn)
     conn.destroy_node()
     rclpy.shutdown()
-
 
 class client(Node):
     
@@ -39,13 +39,14 @@ class client(Node):
         super().__init__('client')
 
         conn = connection()
+        self.working_status_msg =  Int16()
         self.working_status_pub = self.create_publisher(Int16,'working_status',10)
         self.sio = socketio.Client()
         self.turtlebot_status_msg = TurtlebotStatus()
 
-        self.working_status_msg =  Int16()
-        self.working_status_msg.data = 0
-
+        thread = threading.Thread(target=self.checkDone_callback, args=[conn])
+        thread.daemon = True 
+        thread.start()
 
         @self.sio.event
         def connect():
@@ -54,13 +55,20 @@ class client(Node):
             conMod_thread.start()
             # print('connection established')
 
-        @self.sio.on('deviceOnToROS')
+        @self.sio.on('deviceControlToROS')
         def deviceOn(data):
-            print('divce On ros')
+            print('clinet.py : device Control 명령이 들어왔습니다.')
 
-        @self.sio.on('deviceOffToROS')
-        def deviceOff(data):
-            print('divce Off ros')
+            conn.operation = data
+            
+            if data['arrival']['on_off'] == 'on':
+                conn.want_stuff = -1
+            else: # off
+                conn.want_stuff = -2
+
+            self.working_status_msg.data = getUDPstage(1)
+            print('client.py : 1단계 working_status_msg를 publish 합니다.')
+            self.working_status_pub.publish(self.working_status_msg)
 
         @self.sio.on('stuffBringToROS')
         def stuffBringStart(data):
@@ -76,7 +84,7 @@ class client(Node):
                 conn.want_stuff = 3
                 print("물로 넣음")
             # original test
-            self.working_status_msg.data = 0b1
+            self.working_status_msg.data = getCurrStage(1)
             
             # tf_test
             # self.working_status_msg.data = 0b111
@@ -98,7 +106,6 @@ class client(Node):
             bot_status_response = dict()
             
             bot_status_response['available'] = '사용가능' if conn.working_status_msg.data == 0 else '사용불가'
-            bot_status_response['stuff'] = stuff_status[conn.want_stuff_msg.data]
             bot_status_response['job'] = work_status[conn.working_status_msg.data]
             
             self.sio.emit('bot_status_response_ros', bot_status_response)
@@ -109,6 +116,21 @@ class client(Node):
         
 
         self.sio.connect('http://localhost:12001/')
+
+    def checkDone_callback(self, conn):
+        prev = 0
+        curr = 0
+        while True:
+            if conn != None:
+                curr = conn.doneCount
+
+                if prev != curr:
+                    print('작업 하나 완료')
+                    jd = dict()
+                    jd['data']='done'
+                    self.sio.emit('jobDone',jd)
+                prev = conn.doneCount
+            time.sleep(1)
 
 
 def main(args=None):

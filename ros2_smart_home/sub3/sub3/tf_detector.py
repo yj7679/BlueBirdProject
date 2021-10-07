@@ -32,7 +32,7 @@ from sub2.ex_calib import *
 
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
-
+from modules import *
 from geometry_msgs.msg import Twist
 # 설치한 tensorflow를 tf 로 import 하고,
 # object_detection api 내의 utils인 vis_util과 label_map_util도 import해서
@@ -121,7 +121,7 @@ class detection_net_class():
         
         image_process = np.copy(image_np)
 
-        idx_detect = np.arange(scores.shape[1]).reshape(scores.shape)[np.where(scores>0.95)]
+        idx_detect = np.arange(scores.shape[1]).reshape(scores.shape)[np.where(scores>0.97)]
 
         boxes_detect = boxes[0, idx_detect, :]
 
@@ -474,10 +474,9 @@ def main(args=None):
         for _ in range(2):
 
             rclpy.spin_once(g_node)
-        if is_img_bgr and is_scan and is_imu and is_status and is_want_stuff and is_working_status and (working_status_msg.data == 0b0111 or working_status_msg.data == 0b1111):
+        if is_img_bgr and is_scan and is_imu and is_status and is_want_stuff and is_working_status and checkCurrStage(working_status_msg.data) == 3:
             # 터틀 봇 위치 받음
-            print(working_status_msg.data)
-            working_status_msg.data = 0b1111 # doing_find_object
+            # print(working_status_msg.data)
             loc_z = 0
             loc_z = 0.0
             # 로직 10. object detection model inference
@@ -584,37 +583,31 @@ def main(args=None):
                 image_process = draw_pts_img(image_process, xy_i[:, 0].astype(np.int32),
                                                 xy_i[:, 1].astype(np.int32))
             
-            # 찾지 않았으면 회전하는거
-            cmd_msg.linear.x=0.0
-            cmd_msg.angular.z=0.2
+
             
 
             # 찾았으면 상태 업데이트 하고 멈추기 후 목표점 publish 
             if is_find_object == True:
+                print("물건 찾았다")
                 cmd_msg.linear.x=0.0
                 cmd_msg.angular.z=0.0
                 cmd_pub.publish(cmd_msg)
-                if working_status_msg.data == 0b01111: # doing find object
-                    print("can_go_object")
-                    working_status_msg.data = 0b0111111 # can go object생략하고 doing go object로 변경
-                    goal_location = PoseStamped()
-                    goal_location.header.frame_id = 'map'
-                    goal_location.pose.position.x = float(object_global_pose[0])
-                    goal_location.pose.position.y = float(object_global_pose[1])
-                    goal_location.pose.orientation.w = 0.0
-                    goal_pose_pub.publish(goal_location)
-                    print(working_status_msg.data)
-                    working_status_pub.publish(working_status_msg)
-
-            else: #못찾은 경우 
-                working_status_msg.data == 0b01111
+                    
+                working_status_msg.data = getCurrStage(4) # can go object생략하고 doing go object로 변경
+                goal_location = PoseStamped()
+                goal_location.header.frame_id = 'map'
+                goal_location.pose.position.x = float(object_global_pose[0])
+                goal_location.pose.position.y = float(object_global_pose[1])
+                goal_location.pose.orientation.w = 0.0
+                goal_pose_pub.publish(goal_location)
+                print(working_status_msg.data)
                 working_status_pub.publish(working_status_msg)
+
+
             visualize_images(image_process, infer_time)
             print(is_working_status)
         
-        if working_status_msg.data == 0b1111 and is_find_object == False:
-            cmd_pub.publish(cmd_msg)
-
+        
         
 
 

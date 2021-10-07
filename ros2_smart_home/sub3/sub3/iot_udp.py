@@ -8,6 +8,8 @@ import threading
 import struct
 import binascii
 import datetime
+from std_msgs.msg import Int16, Int8
+from modules import *
 
 # iot_udp 노드는 udp 통신을 이용해 iot로 부터 uid를 얻어 접속, 제어를 하는 노드입니다.
 # sub1,2 에서는 ros 메시지를 이용해 쉽게 제어했지만, advanced iot 제어에서는 정의된 통신프로토콜을 보고 iot와 직접 데이터를 주고 받는 형식으로 제어하게 됩니다.
@@ -62,40 +64,69 @@ class iot_udp(Node):
         
         self.lock = threading.Lock()
 
+        self.working_status_msg =  Int16()
+        self.working_status_msg.data = 0
+        self.working_status_sub = self.create_subscription(Int16,'/working_status',self.working_status_callback,10) # woring status 값 받고 값을 다시 담아주기 위해 사용
+        self.working_status_pub = self.create_publisher(Int16,'working_status',10)
+
+        self.want_stuff_msg =Int8()
+        self.want_stuff_sub = self.create_subscription(Int8,'/want_stuff', self.want_stuff_callback, 10) # 찾으려는 물건 값을 받기 위해 사용
+
         # 로직 2. 멀티스레드를 이용한 데이터 수신
         thread = threading.Thread(target=self.recv_udp_data)
         thread.daemon = True 
         thread.start() 
 
+        # 기기를 끄거나 키라는 명령이 들어오는지 확인한다.
+        self.timer = self.create_timer(0.05, self.timer_callback)
 
         self.is_recv_data=False
         self.recv_data_time=datetime.datetime(1995,11,29,0,0,0)
 
         # os.system('cls')
-        while True:
-            # 로직 5. 사용자 메뉴 생성
-            print('Select Menu [0: scan, 1: connect, 2:control, 3:disconnect, 4:all_procedures ] ')
-            menu=int(input())
+        # while True:
+        #     # 로직 5. 사용자 메뉴 생성
+        #     print('Select Menu [0: scan, 1: connect, 2:control, 3:disconnect, 4:all_procedures ] ')
+        #     menu=int(input())
 
-            if menu == 0 :
-                self.scan()
-            elif menu == 1:
-                self.connect()
-            elif menu == 2:
-                print('Control Menu [0: ON, 1: OFF]')
-                ctrl = int(input())
-                if ctrl==0:
-                    self.control("SWITCH_ON")
-                elif ctrl==1:
-                    self.control("SWITCH_OFF")
-                else :
-                    print('wrong input')
-            elif menu == 3:
-                print(self.recv_data)
-            else:
-                pass
+        #     if menu == 0 :
+        #         self.scan()
+        #     elif menu == 1:
+        #         self.connect()
+        #     elif menu == 2:
+        #         print('Control Menu [0: ON, 1: OFF]')
+        #         ctrl = int(input())
+        #         if ctrl==0:
+        #             self.control("SWITCH_ON")
+        #         elif ctrl==1:
+        #             self.control("SWITCH_OFF")
+        #         else :
+        #             print('wrong input')
+        #     elif menu == 3:
+        #         print(self.recv_data)
+        #     else:
+        #         pass
 
+    def timer_callback(self):
+        # print(getUDPstage(self.working_status_msg.data))
+        if self.working_status_msg.data == getUDPstage(3):
+            print('iot_udp.py : 3단계를 인식했습니다. 가전기기를 제어합니다.')
+            self.scan()
+            self.connect()
+            if self.want_stuff_msg.data == -1: # on
+                self.control('SWITCH_ON')
+            else: # off
+                self.control('SWITCH_OFF')
+            self.working_status_msg.data = getUDPstage(4)
+            print('iot_upd.py : 가전기기제어를 완료했습니다. 4단계를 퍼블리시합니다.')
+            self.working_status_pub.publish(self.working_status_msg)
+
+    def working_status_callback(self, msg):
+        self.working_status_msg = msg
             
+    def want_stuff_callback(self, msg):
+        self.want_stuff_msg = msg
+
     def data_parsing(self,raw_data) :
         
         '''
@@ -204,7 +235,6 @@ class iot_udp(Node):
             elif self.recv_data[1]=='CONNECTION_LOST':
                 con_cmd = 'RESET'
             self.send_data(self.recv_data[0], con_cmd)
-            time.sleep(0.3)
         print('connect success')
         
 
@@ -220,9 +250,11 @@ class iot_udp(Node):
             uid, network_status, device_status = self.recv_data
             if cmd=='SWITCH_ON':
                 while self.recv_data[2] != 'ON':
+                    print('가전기기를 키는중..')
                     self.send_data(uid, cmd)
             elif cmd=='SWITCH_OFF':
                 while self.recv_data[2] != 'OFF':
+                    print('가전기기를 끄는중..')
                     self.send_data(uid, cmd)
             
 

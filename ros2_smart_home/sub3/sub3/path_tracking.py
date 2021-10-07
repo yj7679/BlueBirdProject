@@ -9,6 +9,7 @@ from nav_msgs.msg import Odometry,Path
 from math import pi,cos,sin,sqrt,atan2
 import numpy as np
 from std_msgs.msg import Int16
+from modules import *
 
 # 센서 데이터를 받아 사용하기 위함.
 from sensor_msgs.msg import LaserScan, PointCloud
@@ -65,8 +66,8 @@ class followTheCarrot(Node):
     def timer_callback(self):
         # 가야할 때만 가는 것
 
-        if self.is_status and self.is_odom ==True and self.is_path==True and (self.working_status_msg.data == 0b0011 or self.working_status_msg.data == 0b00111111 or self.working_status_msg.data == 0b11111111):
-
+        # if self.is_status and self.is_odom ==True and self.is_path==True and (self.working_status_msg.data == 0b0011 or self.working_status_msg.data == 0b00111111 or self.working_status_msg.data == 0b11111111 or self.working_status_msg.data == ):
+        if self.is_status and self.is_odom ==True and self.is_path==True:
 
             if len(self.path_msg.poses)> 1:
                 self.is_look_forward_point= False
@@ -145,23 +146,23 @@ class followTheCarrot(Node):
                     self.cmd_msg.linear.x=out_vel
                     self.cmd_msg.angular.z=out_rad_vel
                     
-                # 주행중이다가 can lift이면 들고 멈춘 뒤 들고 state바꾸기
-                if self.status_msg.can_lift == True:
-                    print("들수있다.")
-                    self.cmd_msg.linear.x=0.0
-                    self.cmd_msg.angular.z=0.0
-                    self.working_status_msg.data = 0b01111111 # can_go_arrival
-                    self.working_status_pub.publish(self.working_status_msg)
-                    time.sleep(1)
+ 
                     
            
             else :
                 # 주행 중이다가 마지막 위치 도착하면 실행
                 if self.is_finish_driving == False:
                     print("이거반복되면 안됨!!")
-                    self.is_finish_driving = True
-                    self.working_status_msg.data = ((self.working_status_msg.data) << 1) + 1 # 비트 shift하고 + 1
-                    self.working_status_pub.publish(self.working_status_msg)
+                    if self.working_status_msg.data == getUDPstage(2):
+                        print('path_tracking.py : 2단계에서 목적지에 도착했습니다. 3단계를 퍼블리시합니다.')
+                        self.is_finish_driving = True
+                        self.working_status_msg.data = getUDPstage(3)
+                        self.working_status_pub.publish(self.working_status_msg)
+                    else :
+                        print('working status = 2')
+                        self.is_finish_driving = True
+                        self.working_status_msg.data = getCurrStage(checkCurrStage(self.working_status_msg.data) + 1) # 비트 shift하고 + 1
+                        self.working_status_pub.publish(self.working_status_msg)
                     
 
                 print("no found forward point")
