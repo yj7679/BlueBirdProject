@@ -11,7 +11,7 @@
                     <select v-model="value.depart" class="form-select" aria-label="Default select example">
                         <option disabled value="">물건을 가져올 장소를 선택해주세요.</option>
                         <option value="나에게서">나에게서(from me)</option>
-                        <option value="비품">비품실</option>
+                        <option value="창고">창고</option>
                         <option value="회의">회의실</option>
                         <option value="사무">사무실</option>
                         <option value="세미나">세미나실</option>
@@ -24,7 +24,7 @@
                         <option disabled value="">배달할 물건을 선택해주세요.</option>
                         <option value="물">물</option>
                         <option value="서류철">서류철</option>
-                        <option value="박스">박스</option>
+                        <option value="상자">상자</option>
                     </select>
                 </div>
                 <div class="card-body">
@@ -32,7 +32,7 @@
                     <select v-model="value.arrival" class="form-select" aria-label="Default select example">
                         <option disabled value="">목적지를 선택해주세요.</option>
                         <option value="나에게">나에게(to me)</option>
-                        <option value="비품">비품실</option>
+                        <option value="창고">창고</option>
                         <option value="회의">회의실</option>
                         <option value="사무">사무실</option>
                         <option value="세미나">세미나실</option>

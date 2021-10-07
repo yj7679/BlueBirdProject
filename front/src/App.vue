@@ -20,11 +20,11 @@ export default {
     var today= new Date();
     var h = today.getHours();
     var m = today.getMinutes();
-    
+
     //현재시간도 같이 넣으면 좋을 듯
-    if(data == "SUCCESS"){
+    if(data.result == "SUCCESS"){
         existingEntries.push(h+":"+m+"\n"+"배달에 성공하였습니다.");
-    }else if(data == "FAIL"){
+    }else if(data.result == "FAIL"){
         existingEntries.push(h+":"+m+"\n"+"물건을 찾지 못하였습니다.");
     }else{
         existingEntries.push("알 수 없는 오류가 발생하였습니다.");
