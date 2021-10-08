@@ -120,7 +120,7 @@ io.on('connection', socket => {
         
         const dataToROS = {};
 
-        //console.log('search start room by name : ', command['depart']);
+        console.log('search start room by name : ', command['depart']);
 
         const depart_result = await room_service.getRoom(depart);
         const arrival_result = await room_service.getRoom(arrival);

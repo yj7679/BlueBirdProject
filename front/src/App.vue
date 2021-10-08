@@ -21,6 +21,7 @@ export default {
         var m = today.getMinutes();
         localStorage.setItem('notifications', h+":"+m+"\n"+"배달에 성공하였습니다.")
         localStorage.setItem('update', true)
+        data
       })
     }, 1500);
   },

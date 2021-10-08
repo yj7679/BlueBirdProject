@@ -3,7 +3,7 @@ import App from "./App.vue";
 import router from "./router";
 import io from 'socket.io-client'; 
 
-const socket = io('localhost:12001'); 
+const socket = io('192.168.0.17:12001'); 
 
 Vue.config.productionTip = false;
 Vue.prototype.$socket = socket;

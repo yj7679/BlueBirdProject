@@ -177,6 +177,7 @@ export default {
                 const arrivalCheck = slicing[1].indexOf(arrival)
                 if (arrivalCheck != -1) {
                     // console.log(arrival);
+                    this.sendErrandData['arrival'] = arrival
                 }
             }
             if (!this.findDepart) {

@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         mWebSettings.getUserAgentString();
 
 
-        mWebView.loadUrl("http://192.168.0.20:8080/"); // 웹뷰에 표시할 웹사이트 주소, 웹뷰 시작
+        mWebView.loadUrl("http://192.168.0.17:8080/"); // 웹뷰에 표시할 웹사이트 주소, 웹뷰 시작
     }
 
 }
